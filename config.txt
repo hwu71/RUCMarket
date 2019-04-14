@@ -1,0 +1,5 @@
+RUCMarket.deployed().then(function(i){market=i;})
+RUCToken.deployed().then(function(i){token=i;})
+tokensAvailable = 750000;
+web3.eth.getAccounts().then(function(result){admin=result[0]});
+token.transfer(market.address, tokensAvailable, { from: admin})
