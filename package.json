@@ -1,0 +1,24 @@
+{
+  "name": "ruc-market",
+  "version": "1.0.0",
+  "description": "RUC-Market-platform",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "dev": "lite-server"
+  },
+  "author": "Elaine",
+  "license": "ISC",
+  "dependencies": {
+    "bootstrap": "4.1.3",
+    "chai": "^4.1.2",
+    "chai-as-promised": "^7.1.1",
+    "eth-crypto": "^1.3.3",
+    "lite-server": "^2.4.0",
+    "nodemon": "^1.17.3",
+    "web3": "^1.0.0-beta.52"
+  },
+  "devDependencies": {}
+}
