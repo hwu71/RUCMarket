@@ -354,27 +354,7 @@ contract RUCMarket {
       orders[_orderIndex].state = State.COMPLETED;
   }
   /****************************** Find and Get methods***********************************/
-  /*
-  function getProductName(uint _productId) external view returns(string memory) {
-    Product memory _product = findProductById(_productId);
-    return _product.name;
-  }
-
-  function getProductPrice(uint _productId) external view returns(uint) {
-    Product memory _product = findProductById(_productId);
-    return _product.price;
-  }
-
-  function getProductNumber(uint _productId) external view returns(uint) {
-    Product memory _product = findProductById(_productId);
-    return _product.number;
-  }
-
-  function getProductSeller(uint _productId) external view returns(address) {
-    Product memory _product = findProductById(_productId);
-    return _product.seller;
-  }*/
-  
+    
   function findOrderAndIndexById(uint _orderId) internal view returns(Order memory, uint) {
     for(uint i = 0; i < orders.length; i++) {
        if(orders[i].id == _orderId){
