@@ -49,13 +49,6 @@ contract RUCToken {
 		return true;
 	}
 
-    /*function ApproveFrom(address _owner,address _spender, uint256 _value ) public returns (bool success){
-        allowance[_owner][_spender] = _value;
-
-		emit Approval(_owner, _spender, _value);
-
-		return true;
-    }*/
     
 	function transferFrom(address _from, address  _to, uint256 _value) public returns (bool success) {
 		require(_value <= balanceOf[_from]);

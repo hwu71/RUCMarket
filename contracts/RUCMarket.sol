@@ -30,7 +30,9 @@ contract RUCMarket {
     uint deliverFee;
     uint number;
     address seller;
+    string sellAddress;
     address buyer;
+    string buyerAddress;
     uint courierId;
     State state;
     uint deliverTime; 
@@ -42,31 +44,31 @@ contract RUCMarket {
     uint price;
     uint number;
     uint unconfirmedRequests;
-    //address[] buyers;
-    //mapping (address => bool) isConfirmed;
     address seller;
-    //Order[] orders;
+    string url;
   }
   
-  struct AddressInfo {
+ /* struct AddressInfo {
       string firstName;
       string lastName;
       string phoneNumber;
       string zipCode;
       string street;
       string province;
-  }
+  }*/
   
   struct Courier {
       uint id;
       address accountAddress;
       string companyName;
+      string publicKey;
       uint fee;
   }
   
-  mapping (address => AddressInfo) addressTable;
-  mapping (address => bool) registerTable;
-  mapping (address => bool) isCourier;
+  //mapping (address => AddressInfo) addressTable;
+  //mapping (address => bool) registerTable;
+  mapping (address => bool) certifiedCourier; // for admin to certify courier
+  mapping (address => bool) isCourier;  // for check if a courier double registers
 
   Product[] products;
   Order[] orders;
@@ -103,17 +105,17 @@ contract RUCMarket {
     emit TokenSell(msg.sender, _numberOfTokens);
   }
   
-  function showMyBalance() public view returns(uint){
+  /*function showMyBalance() public view returns(uint){
     return  token.balanceOf(msg.sender); 
-  }
+  }*/
   
-  function endSale() public {
+  /*function endSale() public {
     require(msg.sender == admin);
     require(token.transfer(admin, token.balanceOf(address(this))));
 
     // Just transfer the balance to admin
     admin.transfer(address(this).balance);
-  }
+  }*/
   
   /************************ Purchase Part **************************************************************/
   
@@ -172,8 +174,13 @@ contract RUCMarket {
           addressTable[msg.sender] = addressInfo;
           
   }*/
-  
-  function I_am_courier(string memory _companyName, uint _fee) public {
+  function addCourier(address _courierAddress) public{
+    require(msg.sender == admin);         // only by admin
+    certifiedCourier[_courierAddress] = true;
+  }
+
+  function courierRegister(string memory _companyName, string memory _publicKey, uint _fee) public {
+      require(certifiedCourier[msg.sender]); // require msg.sender to be already certified
       require(!isCourier[msg.sender]); // prevent double register
       
       Courier memory _courier;
@@ -181,13 +188,14 @@ contract RUCMarket {
       _courier.id = totalCourierNumber; //id = totalCourierNumber 
       _courier.accountAddress = msg.sender;
       _courier.companyName = _companyName;
+      _courier.publicKey = _publicKey;
       _courier.fee = _fee;
       
       couriers.push(_courier);
       isCourier[msg.sender] = true;
   }
   // how to pass parameter : string? 
-  function addProduct(string memory _name, uint _price, uint _number) public {
+  function addProduct(string memory _name, uint _price, uint _number, string memory _url) public {
     require(_price > 0);
     require(_number > 0);
     
@@ -198,7 +206,7 @@ contract RUCMarket {
     _product.price = _price;
     _product.number = _number;
     _product.seller = msg.sender;
-    
+    _product.url = _url;
     products.push(_product);
   }
 
