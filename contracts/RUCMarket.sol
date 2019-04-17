@@ -48,14 +48,6 @@ contract RUCMarket {
     string url;
   }
   
- /* struct AddressInfo {
-      string firstName;
-      string lastName;
-      string phoneNumber;
-      string zipCode;
-      string street;
-      string province;
-  }*/
   
   struct Courier {
       uint id;
@@ -105,75 +97,9 @@ contract RUCMarket {
     emit TokenSell(msg.sender, _numberOfTokens);
   }
   
-  /*function showMyBalance() public view returns(uint){
-    return  token.balanceOf(msg.sender); 
-  }*/
-  
-  /*function endSale() public {
-    require(msg.sender == admin);
-    require(token.transfer(admin, token.balanceOf(address(this))));
-
-    // Just transfer the balance to admin
-    admin.transfer(address(this).balance);
-  }*/
   
   /************************ Purchase Part **************************************************************/
   
-  /*function register(
-      string memory _firstName, 
-      string memory _lastName, 
-      string memory _phoneNumber, 
-      string memory _zipCode, 
-      string memory _street, 
-      string memory _province) 
-      public{
-          require(!registerTable[msg.sender]);
-          
-          AddressInfo memory addressInfo;
-          
-          addressInfo.firstName = _firstName;
-          addressInfo.lastName = _lastName;
-          addressInfo.phoneNumber = _phoneNumber;
-          addressInfo.zipCode = _zipCode;
-          addressInfo.street = _street;
-          addressInfo.province = _province;
-          
-          addressTable[msg.sender] = addressInfo;
-          
-          registerTable[msg.sender] = true;
-      
-  }*/
-  
-  /*
-  string firstName;
-      string lastName;
-      byte[11] phoneNumber;
-      byte[6] zipCode;
-      string street;
-      string province;
-  */
-  /*function modifyAddressInfo(
-      string memory _firstName, 
-      string memory _lastName, 
-      string memory _phoneNumber, 
-      string memory _zipCode, 
-      string memory _street, 
-      string memory _province) 
-      public {
-          require(registerTable[msg.sender]);
-          
-          AddressInfo memory addressInfo;
-          
-          addressInfo.firstName = _firstName;
-          addressInfo.lastName = _lastName;
-          addressInfo.phoneNumber = _phoneNumber;
-          addressInfo.zipCode = _zipCode;
-          addressInfo.street = _street;
-          addressInfo.province = _province;
-          
-          addressTable[msg.sender] = addressInfo;
-          
-  }*/
   function addCourier(address _courierAddress) public{
     require(msg.sender == admin);         // only by admin
     certifiedCourier[_courierAddress] = true;
@@ -194,7 +120,7 @@ contract RUCMarket {
       couriers.push(_courier);
       isCourier[msg.sender] = true;
   }
-  // how to pass parameter : string? 
+  
   function addProduct(string memory _name, uint _price, uint _number, string memory _url) public {
     require(_price > 0);
     require(_number > 0);
@@ -237,8 +163,6 @@ contract RUCMarket {
     _order.state = State.REQUESTED;
 
     orders.push(_order);
-
-   // products[_productIndex].number = products[_productIndex].number.sub(_requestNumber);
     
   }
   
@@ -278,25 +202,31 @@ contract RUCMarket {
       emit Purchase( _order.productId, _product.price, _order.number, _order.seller, _order.buyer);
   }
   
-  function sellerSendProduct(uint _orderId) external {
+  function sellerSendProduct(uint _orderId, bytes32 _hash, bytes calldata _sig) external {
       require(_orderId != 0);
       (Order memory _order,uint _orderIndex) = findOrderAndIndexById(_orderId);
       require(_order.id != 0); // order exist
+      require(msg.sender == _order.seller); //msg.sender == order's seller
       
       Courier memory _courier = findCourierById(_order.courierId);
-      require(msg.sender == _courier.accountAddress); //msg.sender == order's courier
+      require(recover(_hash,_sig) == _courier.accountAddress); // verify signature from courier
+      
       require(_order.state == State.SELLER_COMFIRMED); // state == SELLER_COMFIRMED
       
       token.transfer(_courier.accountAddress, _order.deliverFee); // pay deliver fee
       orders[_orderIndex].state = State.SELLER_SENT; //change state to "SELLER_SENT"
   }
   
-  function buyerGetProduct(uint _orderId) external {
+  function productDeliveredToBuyer(uint _orderId, bytes32 _hash, bytes calldata _sig) external {
       require(_orderId != 0);
       (Order memory _order,uint _orderIndex) = findOrderAndIndexById(_orderId);
       require(_order.id != 0); // order exist
       
-      require(msg.sender == _order.buyer); // msg.sender == buyer
+      require(recover(_hash,_sig) == _order.buyer); // verify signature from buyer
+      
+      Courier memory _courier = findCourierById(_order.courierId);
+      require(msg.sender == _courier.accountAddress); //msg.sender == order's courier
+      
       require(_order.state == State.SELLER_SENT); // require previous state
       
       //token.transferFrom(address(this), _order.seller, _order.productValue);
@@ -348,25 +278,31 @@ contract RUCMarket {
       
   }
   
-  function buyerSendProduct(uint _orderId) external {
+  function buyerSendProduct(uint _orderId, bytes32 _hash, bytes calldata _sig) external {
       require(_orderId != 0);
       (Order memory _order,uint _orderIndex) = findOrderAndIndexById(_orderId);
       require(_order.id != 0); // order exist
+      require(msg.sender == _order.buyer); //msg.sender == order's buyer
       
       Courier memory _courier = findCourierById(_order.courierId);
-      require(msg.sender == _courier.accountAddress); //msg.sender == order's courier
+      require(recover(_hash,_sig) == _courier.accountAddress); // verify signature
+      
       require(_order.state == State.WILL_RETURN); // state == WILL_RETURN
       
       token.transfer(_courier.accountAddress, _order.deliverFee); // pay deliver fee
       orders[_orderIndex].state = State.BUYER_SENT; //change state to "SELLER_SENT"
   }
   
-  function sellerGetProduct(uint _orderId) external {
+  function productDeliveredToSeller(uint _orderId, bytes32 _hash, bytes calldata _sig) external {
       require(_orderId != 0);
       (Order memory _order,uint _orderIndex) = findOrderAndIndexById(_orderId);
       require(_order.id != 0); // order exist
       
-      require(msg.sender == _order.seller); // msg.sender == seller
+      require(recover(_hash,_sig) == _order.seller); // verify signature from seller
+      
+      Courier memory _courier = findCourierById(_order.courierId);
+      require(msg.sender == _courier.accountAddress); //msg.sender == order's courier
+
       require(_order.state == State.BUYER_SENT); // require previous state
       
       //token.transferFrom(address(this), _order.seller, _order.productValue);
@@ -451,7 +387,7 @@ contract RUCMarket {
     return (order, 0);
   }
   
-  function findOrderById(uint _orderid) public view returns(Order memory){
+  function findOrderById(uint _orderid) internal view returns(Order memory){
       for(uint i = 0; i < orders.length; i++){
           if(orders[i].id == _orderid)
             return orders[i];
@@ -570,5 +506,43 @@ contract RUCMarket {
     
     return courier;
   }
- 
+/*********************************Verify Signature*****************************************/
+  function recover(bytes32 hash, bytes memory signature)
+      public
+      pure
+      returns (address)
+    {
+      bytes32 r;
+      bytes32 s;
+      uint8 v;
+
+      // Check the signature length
+      if (signature.length != 65) {
+        return (address(0));
+      }
+
+      // Divide the signature in r, s and v variables
+      // ecrecover takes the signature parameters, and the only way to get them
+      // currently is to use assembly.
+      // solium-disable-next-line security/no-inline-assembly
+      assembly {
+        r := mload(add(signature, 0x20))
+        s := mload(add(signature, 0x40))
+        v := byte(0, mload(add(signature, 0x60)))
+      }
+
+      // Version of signature should be 27 or 28, but 0 and 1 are also possible versions
+      if (v < 27) {
+        v += 27;
+      }
+
+      // If the version is correct return the signer address
+      if (v != 27 && v != 28) {
+        return (address(0));
+      } else {
+        // solium-disable-next-line arg-overflow
+        return ecrecover(hash, v, r, s);
+      }
+    }
+
 }
