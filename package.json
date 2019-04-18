@@ -12,7 +12,7 @@
   "author": "Elaine",
   "license": "ISC",
   "dependencies": {
-    "bootstrap": "4.1.3",
+    "bootstrap": ">=4.3.1",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "eth-crypto": "^1.3.3",

@@ -134,25 +134,115 @@ App = {
         loader.hide();
         content.show();
       })
-	});
-   },
-    buyTokens: function() {
-    $('#content').hide();
-    $('#loader').show();
-    var numberOfTokens = $('#numberOfTokens').val();
-    console.log("number of tokens: ",numberOfTokens);
-    App.contracts.RUCMarket.deployed().then(function(instance) {
-    	console.log("instance address:",instance);
-      return instance.buyTokens(numberOfTokens, {
+	  });
+  },
+  viewProduct: function(){
+    var productContent = $('#view-product-content');
+    var productTemplate = $('#productTemplate');
+
+    App.contracts.RUCMarket.deployed().then(function(instance){
+      console.log("instance address: ",instance);
+      //console.log("instance products:", instance.products);
+      return instance.productsNumber().then(function(result){
+        var length = result.c[0];
+        console.log("products number:", result.toNumber());
+        for (i = 0; i < length; i ++) {
+          instance.products(i).then(function(instance){
+            var product = instance;
+            console.log("product:",instance);
+            var productId = product[0].toNumber();
+            var productName = product[1];
+            var productPrice = product[2].toNumber();
+            var productNumber = product[3].toNumber();
+            var productSeller = product[4];
+            console.log("seller",productSeller)
+            var productUrl = product[5];
+
+            productTemplate.find('.panel-title').text(productName);
+            productTemplate.find('img').attr('src', productUrl);
+            productTemplate.find('.productPrice').text(productPrice);
+            productTemplate.find('.productRemainingNumber').text(productNumber);
+            productTemplate.find('.productSeller').text(productSeller);
+            productTemplate.find('.btn-buy').attr('data-id', productId);
+            productContent.append(productTemplate.html());
+        });
+       } 
+      })
+    })
+  },
+
+  addProduct: function(){
+    var productName = $('#nameOfProduct').val();
+    var productImage = $('#imageOfProduct').val();
+    var productPrice = $('#priceOfProduct').val();
+    var productNumber = $('#numberOfProduct').val();
+    //console.log("productName:",productName);
+    //console.log("productImage:",productImage);
+    //console.log("productPrice:",productPrice);
+    //console.log("productNumber:",productNumber);
+    App.contracts.RUCMarket.deployed().then(function(instance){
+      //console.log("instance address: ",instance);
+      return instance.addProduct(productName, productPrice, productNumber, productImage, {
         from: App.account,
-        value: numberOfTokens * App.tokenPrice,
-        gas: 500000// Gas limit
+        gas: 500000
       });
-    }).then(function(result) {
-      console.log("Tokens bought...")
-      $('form').trigger('reset') // reset number of tokens in form
-      // Wait for Sell event
+    }).then(function(result){
+      console.log("Product added...");
+      $('form').trigger('reset') // reset the form
+    })
+  },
+
+  addCourier: function(){
+    var courierAddress = $('#courierAddress').val();
+    console.log("courier address: ",courierAddress);
+    App.contracts.RUCMarket.deployed().then(function(instance) {
+      //console.log("instance address:",instance);
+      return instance.addCourier(courierAddress, {
+        from: App.account,
+        gas: 500000
+      });
+    }).then(function(result){
+      console.log("Courier added...")
+      $('form').trigger('reset') // reset the form
+    })
+  },
+
+  courierRegister: function(){
+    var companyName = $('#companyName').val();
+    //console.log("Courier company name: ", companyName);
+    var deliverFee = $('#deliverFee').val();
+    //console.log("Courier deliver fee: ",deliverFee);
+    var publicKey = $('#publicKey').val();
+    //console.log("Courier public key: ",publicKey);
+    App.contracts.RUCMarket.deployed().then(function(instance){
+      //console.log("instance address:",instance);
+      return instance.courierRegister(companyName, publicKey, deliverFee, {
+        from: App.account,
+        gas: 500000
+      });
+    }).then(function(result){
+      console.log("Courier registered...")
+      $('form').trigger('reset')
+    })
+  },
+
+  buyTokens: function() {
+  $('#content').hide();
+  $('#loader').show();
+  var numberOfTokens = $('#numberOfTokens').val();
+  console.log("number of tokens: ",numberOfTokens);
+  App.contracts.RUCMarket.deployed().then(function(instance) {
+  	console.log("instance address:",instance);
+    return instance.buyTokens(numberOfTokens, {
+      from: App.account,
+      value: numberOfTokens * App.tokenPrice,
+      gas: 500000// Gas limit
     });
+  }).then(function(result) {
+    console.log("Tokens bought...")
+    $('form').trigger('reset') // reset number of tokens in form
+    // Wait for Sell event
+  });
   }
 }
 

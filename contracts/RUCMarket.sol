@@ -43,7 +43,7 @@ contract RUCMarket {
     string name;
     uint price;
     uint number;
-    uint unconfirmedRequests;
+    //uint unconfirmedRequests;
     address seller;
     string url;
   }
@@ -62,7 +62,7 @@ contract RUCMarket {
   mapping (address => bool) certifiedCourier; // for admin to certify courier
   mapping (address => bool) isCourier;  // for check if a courier double registers
 
-  Product[] products;
+  Product[] public products;
   Order[] orders;
   Courier[] public couriers;
   
@@ -353,8 +353,13 @@ contract RUCMarket {
       token.transfer(_order.seller, _order.productValue.add(_order.deliverFee));
       orders[_orderIndex].state = State.COMPLETED;
   }
+
   /****************************** Find and Get methods***********************************/
     
+  function productsNumber() external view returns(uint){
+    return products.length;
+  }
+
   function findOrderAndIndexById(uint _orderId) internal view returns(Order memory, uint) {
     for(uint i = 0; i < orders.length; i++) {
        if(orders[i].id == _orderId){

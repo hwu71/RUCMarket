@@ -26,15 +26,16 @@
             <br/>
       </div>
        
-       <div id="content" class="row col-12" >
+       <div id="content" class="row col-12" style="display: none;">
          <div class="col-3">
           <div class="list-group">
-           <a data-toggle="list" href="#view-product-content" class="list-group-item list-group-item-action active">View Products</a>
+           <a data-toggle="list" href="#view-product-content" class="list-group-item list-group-item-action active" onClick="App.viewProduct(); return false;">View Products</a>
            <a data-toggle="list" href="#buy-product-content" class="list-group-item list-group-item-action">buy Products</a>
            <a data-toggle="list" href="#add-product-content" class="list-group-item list-group-item-action">Add Products</a>
            <a data-toggle="list" href="#view-order-content" class="list-group-item list-group-item-action">View Orders</a>
            <a data-toggle="list" href="#buy-token-content" class="list-group-item list-group-item-action">Buy token</a>
-           <a data-toggle="list" href="#add-courier-content" class="list-group-item list-group-item-action">Add courier</a>
+           <a data-toggle="list" href="#add-courier-content" class="list-group-item list-group-item-action">Add Courier</a>
+           <a data-toggle="list" href="#courier-register-content" class="list-group-item list-group-item-action">Courier Register</a>
           </div>
          </div>
          <div class="col-9">
@@ -50,23 +51,29 @@
               <form onSubmit="App.addProduct(); return false;" class="from-group" role="form"> 
                 <div>
                   <label for="nameOfProduct">Product Name</label> 
-                  <input id="nameOfProduct" class="form-control" type="text" pattern="^[\u4E00-\u9FA5A-Za-z0-9_]+$">
+                  <input id="nameOfProduct" class="form-control" type="text" pattern="^[\u4E00-\u9FA5A-Za-z0-9_]+$" required="required">
                   <small class="form-text text-muted">Please input the name of the product.</small>
                 </div>
                 <br>
                 <div>
+                  <label for="imageOfProduct">Product Image</label> 
+                  <input id="imageOfProduct" class="form-control" type="url" pattern="[a-zA-z]+://[^\s]*" required="required">
+                  <small class="form-text text-muted">Please input the online url of product's image.</small>
+                </div>
+                <br>
+                <div>
                   <label for="priceOfProduct">Product price</label>  
-                  <input id="priceOfProduct" class="form-control" type="float" name="float" value="1.0"  pattern="\d+(\.\d+)?$">
+                  <input id="priceOfProduct" class="form-control" type="float" name="float" placeholder="1.0"  pattern="\d+(\.\d+)?$" required="required">
                   <small class="form-text text-muted">Please input the price of the product.</small>
                 </div>
                 <br>
                 <div>
                   <label for="numberOfProduct">Product number</label> 
-                  <input id="numberOfProduct" class="form-control" type="number" name="number" value="1" min="1" pattern="[0-9]">
+                  <input id="numberOfProduct" class="form-control" type="number" name="number" placeholder="1" min="1" pattern="[0-9]" required="required">
                   <small class="form-text text-muted">Please input the number of the product.</small>
                 </div>
                 <br>
-                <button type="submit" class="btn btn-primary btn-lg form-group-btn" disabled="disabled">Add Product</button>
+                <button type="submit" class="btn btn-primary btn-lg form-group-btn" >Add Product</button>
               </form>
              </div>
              <div class="tab-pane fade" id="view-order-content"> View orders!</div>
@@ -74,7 +81,7 @@
                <div id="content" class="text-center" ></!--style="display: none;"-->
                 <p>
                   Introducing "RUC Token" (RUC Market)!
-                  Token price is <span class="token-price"></span> Ether. You currently have <span class="ructokenS-balance"></span>&nbsp;RUC Token.
+                  Token price is <span class="token-price"></span> Ether. You currently have <span class="ructoken-balance"></span>&nbsp;RUC Token.
                 </p>
                 <br/>
                 <form onSubmit="App.buyTokens(); return false;" role="form">
@@ -100,24 +107,36 @@
              <div class="tab-pane fade" id="add-courier-content">
               <form onSubmit="App.addCourier(); return false;" class="from-group" role="form"> 
                 <div>
-                  <label for="CourierCompanyName">Company Name</label> 
-                  <input id="CourierCompanyName" class="form-control" type="text" pattern="^[\u4E00-\u9FA5A-Za-z0-9_]+$">
+                  <label for="courierAddress">Courier Address</label> 
+                  <input id="courierAddress" class="form-control" type="text" pattern="^(0x)+([A-Fa-f0-9]{40})$" required="required">
+                  <small class="form-text text-muted">Please input the address of the certified courier.</small>
+                </div>
+                <br>
+                <button type="submit" class="btn btn-primary btn-lg form-group-btn" >Add courier</button>
+              </form>
+             </div>
+             <div class="tab-pane fade" id="courier-register-content">
+              <form onSubmit="App.courierRegister(); return false;" class="from-group" role="form"> 
+                <div>
+                  <label for="companyName">Company Name</label> 
+                  <input id="companyName" class="form-control" type="text" pattern="^[\u4E00-\u9FA5A-Za-z0-9_]+$" required="required">
                   <small class="form-text text-muted">Please input the name of the your company.</small>
                 </div>
                 <br>
                 <div>
                   <label for="deliverFee">Deliver fee</label>  
-                  <input id="deliverFee" class="form-control" type="float" name="float" value="1.0"  pattern="\d+(\.\d+)?$">
+                  <input id="deliverFee" class="form-control" type="float" name="float"  pattern="\d+(\.\d+)?$" required="required">
                   <small class="form-text text-muted">Please input the deliver fee of your company.</small>
                 </div>
                 <br>
                 <div>
                   <label for="publicKey">Public Key</label> 
-                  <input id="publicKey" class="form-control" type="text" pattern="^[A-Za-z0-9_]+$">
+                  <textarea id="publicKey" rows="7" class="form-control" pattern="^(-----BEGIN PUBLIC KEY-----\s)?((.)+\s){4}(-----END PUBLIC KEY-----)?$" required="required">
+                  </textarea>
                   <small class="form-text text-muted">Please input the public key of the your company.</small>
                 </div>
                 <br>
-                <button type="submit" class="btn btn-primary btn-lg form-group-btn" disabled="disabled">Add courier</button>
+                <button type="submit" class="btn btn-primary btn-lg form-group-btn" >Courier Register</button>
               </form>
              </div>
            </div>
@@ -128,16 +147,17 @@
 
     <div id="productTemplate" style="display:none">
       <div class="col-sm-6 col-md-4 col-lg-3">
-        <div class="panel panel-default">
+        <div class="panel panel-default panel-pet">
           <div class="panel-heading">
             <h3 class="panel-title">Apple</h3>
           </div>
           <div class="panel-body">
             <img alt="140x140" data-src="holder.js/140x140" class="img-rounded img-center" style="width: 100%;" src="https://animalso.com/wp-content/uploads/2017/01/Golden-Retriever_6.jpg" data-holder-rendered="true">
-            <br/><br/>
-            <strong>Price</strong>: <span >15</span><br/>
-            <strong>Remaining</strong>: <span class="pet-age">3</span><br/><br/>
-            <button class="btn btn-default " type="button" data-id="0">Buy</button>
+            <br/>
+            <strong>Price</strong>: <span class="productPrice">15</span><br/>
+            <strong>Remaining</strong>: <span class="productRemainingNumber">3</span><br/>
+            <strong>Seller</strong>: <span class="productSeller">0x</span><br/><br/>
+            <button class="btn btn-default btn-buy" type="button" data-id="0">Buy</button>
           </div>
         </div>
       </div>
