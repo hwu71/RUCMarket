@@ -28,6 +28,13 @@
 //console.log(encrypted);
 //var decrypted = courier.decrypt(encrypted)
 //console.log(decrypted);
+//var Vue1 = require('Vue');
+//console.log(Vue1);
+
+new Vue({
+  console.log("vue!");
+});
+
 App = {
   web3Provider: null,
   contracts: {},
@@ -109,6 +116,8 @@ App = {
     })
 
     // Load token sale contract
+    App.viewProduct();
+
     App.contracts.RUCMarket.deployed().then(function(instance) {
       rucMarketInstance = instance;
       return rucMarketInstance.tokenPrice();
@@ -130,6 +139,7 @@ App = {
         return rucTokenInstance.balanceOf(App.account);
       }).then(function(balance) {
         $('.ructoken-balance').html(balance.toNumber());
+        $('#ructoken-balance').html("Your RUC Token balance: " + balance.toNumber());
         App.loading = false;
         loader.hide();
         content.show();
@@ -137,7 +147,7 @@ App = {
 	  });
   },
   viewProduct: function(){
-    var productContent = $('#view-product-content');
+    var productContent = $('#product-content');
     var productTemplate = $('#productTemplate');
 
     App.contracts.RUCMarket.deployed().then(function(instance){
@@ -158,12 +168,15 @@ App = {
             console.log("seller",productSeller)
             var productUrl = product[5];
 
-            productTemplate.find('.panel-title').text(productName);
+            productTemplate.find('#productName').text(productName);
             productTemplate.find('img').attr('src', productUrl);
-            productTemplate.find('.productPrice').text(productPrice);
-            productTemplate.find('.productRemainingNumber').text(productNumber);
-            productTemplate.find('.productSeller').text(productSeller);
-            productTemplate.find('.btn-buy').attr('data-id', productId);
+            productTemplate.find('#productPrice').text(productPrice);
+            productTemplate.find('#productRemainingNumber').text(productNumber);
+            //productTemplate.find('.productSeller').text(productSeller);
+            productTemplate.find('#productId').attr('data-id', productId);
+            if(productNumber>0){
+              productTemplate.find('#productId').attr('disabled',false);
+            }
             productContent.append(productTemplate.html());
         });
        } 
