@@ -360,6 +360,10 @@ contract RUCMarket {
     return products.length;
   }
 
+  function couriersNumber() external view returns(uint){
+    return couriers.length;
+  }
+
   function findOrderAndIndexById(uint _orderId) internal view returns(Order memory, uint) {
     for(uint i = 0; i < orders.length; i++) {
        if(orders[i].id == _orderId){

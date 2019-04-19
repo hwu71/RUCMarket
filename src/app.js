@@ -32,7 +32,7 @@
 //console.log(Vue1);
 //import Vue from 'vue';
 //console.log(Vue);
-var app2 = new Vue({
+/*var app2 = new Vue({
   el: '#requestProduct',
   data:{
     productId: 0,
@@ -45,7 +45,7 @@ var app2 = new Vue({
   methods: {
     
   }
-})
+})*/
 App = {
   web3Provider: null,
   contracts: {},
@@ -162,31 +162,32 @@ App = {
     var productTemplate = $('#productTemplate');
 
     App.contracts.RUCMarket.deployed().then(function(instance){
-      console.log("instance address: ",instance);
+      //console.log("instance address: ",instance);
       //console.log("instance products:", instance.products);
       return instance.productsNumber().then(function(result){
-        var length = result.c[0];
-        console.log("products number:", result.toNumber());
+        var length = result.toNumber();
+        //console.log("products number:", result.toNumber());
         for (i = 0; i < length; i ++) {
           instance.products(i).then(function(instance){
             var product = instance;
-            console.log("product:",instance);
+            //console.log("product:",instance);
             var productId = product[0].toNumber();
             var productName = product[1];
             var productPrice = product[2].toNumber();
             var productNumber = product[3].toNumber();
             var productSeller = product[4];
-            console.log("seller",productSeller)
+            //console.log("seller",productSeller)
             var productUrl = product[5];
 
+            productTemplate.find('#productId').text(productId);
             productTemplate.find('#productName').text(productName);
             productTemplate.find('img').attr('src', productUrl);
             productTemplate.find('#productPrice').text(productPrice);
             productTemplate.find('#productRemainingNumber').text(productNumber);
             //productTemplate.find('.productSeller').text(productSeller);
-            productTemplate.find('#productId').attr('data-id', productId);
+            productTemplate.find('#buyButton').attr('data-id', productId);
             if(productNumber>0){
-              productTemplate.find('#productId').attr('disabled',false);
+              productTemplate.find('#buyButton').attr('disabled',false);
             }
             productContent.append(productTemplate.html());
         });
@@ -269,8 +270,55 @@ App = {
   });
   },
 
-  buy: function(id) {
-    console.log('id:',id);
+  requestInfo: function(instance) {
+
+    var id = $(instance).attr("data-id");
+    //var v1 = $(this).attr("data-id");
+    //console.log(v);
+    //console.log(v1);
+    //console.log('id:',id);
+    //var productContent = $('#product-content');
+    var requestProductForm = $('#requestProductForm');
+    
+    $('#requestProductForm').trigger('reset');
+    App.contracts.RUCMarket.deployed().then(function(instance){
+      //console.log("instance address: ",instance);
+      //console.log("instance products:", instance.products);
+      //console.log(instance.products(id-1));
+      return instance.products(id-1).then(function(product){
+        //console.log(product);
+        var productPrice = product[2].toNumber();
+        var productNumber = product[3].toNumber();
+        var productSeller = product[4];
+        requestProductForm.find('#idOfProduct').attr('value',id);
+        requestProductForm.find('#priceOfProduct').attr('value',productPrice);
+        requestProductForm.find('#requestNumber').attr('max',productNumber);
+        //console.log(couriers);
+        return instance.couriersNumber().then(function(result){
+          var couriersNumber = result.toNumber();
+          //console.log("couriersNumber: ",couriersNumber);
+          var chooseCourier = $('#chooseCourier');
+          chooseCourier.empty();   
+          for(i = 0;i < couriersNumber;i++){
+              //console.log(instance.couriers(i))
+              instance.couriers(i).then(function(courier){
+                //console.log(courier);
+                var courierId = courier[0].toNumber();
+                //console.log("courierId:", courierId);
+                var companyName = courier[2];
+                var deliverFee = courier[4].toNumber();
+                var courierInfo = $("<option></option>").text(companyName+"("+deliverFee+")").attr('data-id',courierId);
+                chooseCourier.append(courierInfo);
+              })
+          }
+        })
+      });
+    });
+  },
+  requestProduct: function(instance){
+    App.contracts.RUCMarket.deployed().than(function(instance){
+      console.log("instance address:",instance);
+    })
   }
 }
 

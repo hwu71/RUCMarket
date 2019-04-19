@@ -151,10 +151,11 @@
           <div class="card-body text-center">
             <h3 class="card-title" id="productName">Apple</h3>
             <img alt="Card image" src="https://animalso.com/wp-content/uploads/2017/01/Golden-Retriever_6.jpg" width="200px" height="200px"><br/>
+            <strong>Product Id</strong>: <span id="productId" class="card-text">1</span><br/>
             <strong>Price</strong>: <span id="productPrice" class="card-text">15</span><br/>
             <strong>Remaining</strong>: <span id="productRemainingNumber" class="card-text">3</span><br/>
             <!--strong>Seller</strong>: <span class="productSeller card-text">0x</span><br/-->
-            <button id="productId" class="btn btn-primary" type="button" data-id="0" disabled="true" data-toggle="modal" data-target="#requestProduct">Buy</button>
+            <button id="buyButton" class="btn btn-primary" type="button" disabled="true" data-id="0" onClick="App.requestInfo(this); return false;" data-toggle="modal"  data-target="#requestProduct">Buy</button>
             <!--data-toggle="modal" data-target="#requestProduct"-->
           </div>    
       </div>
@@ -171,28 +172,29 @@
             </div>
             <!-- modal body -->
             <div class="modal-body">
-              <form onSubmit="App.requestProduct(); return false;" class="from-group" role="form">
+              <form onSubmit="App.requestProduct(); return false;" class="from-group" id="requestProductForm" role="form">
                 <div>
                   <label for="idOfProduct">Product id</label>  
-                  <input id="idOfProduct" class="form-control" :value="productId" required="required" readonly>
+                  <input id="idOfProduct" class="form-control" value="0" required="required" readonly>
                 </div>
                 <br>
                 <div>
                   <label for="priceOfProduct">Product price</label>  
-                  <input id="priceOfProduct" class="form-control" :value="productPrice" required="required" readonly>
+                  <input id="priceOfProduct" class="form-control" value="0" required="required" readonly>
                 </div>
                 <br>
                 <div>
                   <label for="requestNumber">Request number</label> 
-                  <input id="requestNumber" class="form-control" type="number" name="number" placeholder="1" min="1" pattern="[0-9]" required="required" >
+                  <input id="requestNumber" class="form-control" type="number" name="number" placeholder="1" min="1" max="999" pattern="[0-9]" required="required" >
                   <small class="form-text text-muted">Please input the number of the product you need.</small>
                 </div>
                 <br>
                 <div>
                   <label for="chooseCourier">Choose courier</label> 
                   <select id="chooseCourier" class="form-control" required="required">
-                    <option>Shunfeng</option>
+                    
                   </select>
+
                   <small class="form-text text-muted">Please select one courier company to work for you.</small>
                 </div>
                 <br>
@@ -207,7 +209,6 @@
           </div>
         </div>
       </div> <!--end of modal-->
-
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="./js/bootstrap.min.js"></script>
@@ -215,7 +216,7 @@
     <script src="js/truffle-contract.min.js"></script>
     <script src="js/jsencrypt.min.js"></script>
     <script src="js/vue.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <!--script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script-->
     <script src="app.js"></script>
   </body>
 </html>
