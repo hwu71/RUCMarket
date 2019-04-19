@@ -7,18 +7,12 @@
     <title>RUC Marketplace</title>
     <!-- Bootstrap -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script src="./js/bootstrap.min.js"></script>
-    <script src="js/web3.min.js"></script>
-    <script src="js/truffle-contract.min.js"></script>
-    <script src="js/jsencrypt.min.js"></script>
-    <script src="js/vue.min.js"></script>
+    
     <!--script src="eth-crypto/dist/lib/index.js"></script-->
-    <script src="app.js"></script>
+    
   </head>
   <body>
-
-    <div class="container">
+    <div class="container" id="app" >
       
      <div class="row">
       <div class="col-lg-12">
@@ -161,6 +155,7 @@
             <strong>Remaining</strong>: <span id="productRemainingNumber" class="card-text">3</span><br/>
             <!--strong>Seller</strong>: <span class="productSeller card-text">0x</span><br/-->
             <button id="productId" class="btn btn-primary" type="button" data-id="0" disabled="true" data-toggle="modal" data-target="#requestProduct">Buy</button>
+            <!--data-toggle="modal" data-target="#requestProduct"-->
           </div>    
       </div>
 
@@ -179,17 +174,17 @@
               <form onSubmit="App.requestProduct(); return false;" class="from-group" role="form">
                 <div>
                   <label for="idOfProduct">Product id</label>  
-                  <input id="idOfProduct" class="form-control" value="1" required="required" readonly>
+                  <input id="idOfProduct" class="form-control" :value="productId" required="required" readonly>
                 </div>
                 <br>
                 <div>
                   <label for="priceOfProduct">Product price</label>  
-                  <input id="priceOfProduct" class="form-control" value="1.0"required="required" readonly>
+                  <input id="priceOfProduct" class="form-control" :value="productPrice" required="required" readonly>
                 </div>
                 <br>
                 <div>
                   <label for="requestNumber">Request number</label> 
-                  <input id="requestNumber" class="form-control" type="number" name="number" placeholder="1" min="1" pattern="[0-9]" required="required">
+                  <input id="requestNumber" class="form-control" type="number" name="number" placeholder="1" min="1" pattern="[0-9]" required="required" >
                   <small class="form-text text-muted">Please input the number of the product you need.</small>
                 </div>
                 <br>
@@ -214,5 +209,13 @@
       </div> <!--end of modal-->
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="./js/bootstrap.min.js"></script>
+    <script src="js/web3.min.js"></script>
+    <script src="js/truffle-contract.min.js"></script>
+    <script src="js/jsencrypt.min.js"></script>
+    <script src="js/vue.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="app.js"></script>
   </body>
 </html>

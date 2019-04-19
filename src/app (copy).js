@@ -33,17 +33,13 @@
 //import Vue from 'vue';
 //console.log(Vue);
 var app2 = new Vue({
-  el: '#requestProduct',
   data:{
-    productId: 0,
-    productPrice: 1,
-    productNumber: 1,
-    couriers: [],
-    seller: '0x0',
     message: 'Hello Vue!'
   },
   methods: {
-    
+    a: function(){
+      console.log('vue')
+    }
   }
 })
 App = {
@@ -155,7 +151,7 @@ App = {
         loader.hide();
         content.show();
       })
-    });
+	  });
   },
   viewProduct: function(){
     var productContent = $('#product-content');
@@ -256,7 +252,7 @@ App = {
   var numberOfTokens = $('#numberOfTokens').val();
   console.log("number of tokens: ",numberOfTokens);
   App.contracts.RUCMarket.deployed().then(function(instance) {
-    console.log("instance address:",instance);
+  	console.log("instance address:",instance);
     return instance.buyTokens(numberOfTokens, {
       from: App.account,
       value: numberOfTokens * App.tokenPrice,
