@@ -30,7 +30,7 @@ contract RUCMarket {
     uint deliverFee;
     uint number;
     address seller;
-    string sellAddress;
+    string sellerAddress;
     address buyer;
     string buyerAddress;
     uint courierId;
@@ -167,7 +167,7 @@ contract RUCMarket {
   }
   
   
-  function buyerPayOrder(uint _orderId) external {
+  function buyerPayOrder(uint _orderId, string calldata _buyerAddress) external {
       require(_orderId !=0);
       
       (Order memory _order,uint _orderIndex) = findOrderAndIndexById(_orderId);
@@ -181,10 +181,11 @@ contract RUCMarket {
       require(token.allowance(msg.sender, address(this)) >= totalValue);
       token.transferFrom(msg.sender, address(this), totalValue);
       orders[_orderIndex].state = State.PAYED;
+      orders[_orderIndex].buyerAddress = _buyerAddress;
       
   }
   
-  function sellerComfirmOrder(uint _orderId) external {
+  function sellerConfirmOrder(uint _orderId, string calldata _sellerAddress) external {
       require(_orderId != 0);
       (Order memory _order,uint _orderIndex) = findOrderAndIndexById(_orderId);
       require(_order.id != 0); // order exist
@@ -198,7 +199,7 @@ contract RUCMarket {
       
       orders[_orderIndex].state = State.SELLER_COMFIRMED; //change state to "..."
       products[_productIndex].number = products[_productIndex].number.sub(_order.number); // update product number
-      
+      orders[_orderIndex].sellerAddress = _sellerAddress;
       emit Purchase( _order.productId, _product.price, _order.number, _order.seller, _order.buyer);
   }
   
@@ -363,7 +364,7 @@ contract RUCMarket {
   function couriersNumber() external view returns(uint){
     return couriers.length;
   }
-  function ordresNumber() external view returns(uint){
+  function ordersNumber() external view returns(uint){
     return orders.length;
   }
   function findOrderAndIndexById(uint _orderId) internal view returns(Order memory, uint) {

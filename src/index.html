@@ -32,6 +32,7 @@
              <a data-toggle="list" href="#buy-token-content" class="list-group-item list-group-item-action" onclick="App.renderToken();">Buy token</a>
              <a data-toggle="list" href="#add-courier-content" class="list-group-item list-group-item-action">Add Courier</a>
              <a data-toggle="list" href="#courier-register-content" class="list-group-item list-group-item-action">Courier Register</a>
+             <a data-toggle="list" href="#sign-content" class="list-group-item list-group-item-action">Sign</a>
             </div>
          </div>
          <div class="col-9">
@@ -76,10 +77,10 @@
              <div class="tab-pane fade" id="view-order-user-content"> 
                 <ul class="nav nav-tabs nav-fill justify-content-center">
                   <li class="nav-item">
-                    <a href="#user-orders-content" class="nav-link active" onclick="App.viewOrdersAsBuyer()"> As buyer </a>
+                    <a data-toggle="tab" href="#user-orders-content" class="nav-link active" onclick="App.viewOrdersAsBuyer()"> As buyer </a>
                   </li>
                   <li class="nav-item">
-                    <a href="#user-orders-content" class="nav-link" onclick="App.viewOrdersAsSeller()"> As seller </a>
+                    <a data-toggle="tab" href="#user-orders-content" class="nav-link" onclick="App.viewOrdersAsSeller()"> As seller </a>
                   </li>
                 </ul>
                 <div id="user-orders-content"  >
@@ -94,20 +95,10 @@
                         <th id="buyerOrSeller">Seller</th>
                         <th>Total Fee</th>
                         <th>State</th>
+                        <th>Options</th>
                       </tr>
                     </thead>
                     <tbody id="userOrderTbody">
-                      <tr>
-                        <td id="orderId">1</td>
-                        <td id="productId">1</td>
-                        <td id="productName">abc</td>
-                        <td id="productNumber">999</td>
-                        <td id="deliverCompany">Company</td>
-                        <td id="seller">0x</td>
-                        <td id="totalFee">999</td>
-                        <td id="state"></td>
-
-                      </tr>
                     </tbody>
                   </table>
                 </div>
@@ -175,6 +166,19 @@
                   <button type="submit" class="btn btn-primary btn-lg form-group-btn" >Courier Register</button>
                 </form>
              </div>
+             <div class="tab-pane fade" id="sign-content">
+                <h2>Sign a Message</h2>
+                <p>Sign a message from your account with the form below and broadcast it to the blockchain!</p>
+                <form onSubmit="App.signMessage(); return false;" class="" role="form">
+                  <div class="form-group">
+                    <input id="message" class="form-control" type="text">
+                  </div>
+                  <button type="submit" class="btn btn-primary">Sign & Send</button>
+                </form>
+                <p id="msg"></p>
+                <p id="signature"></p>
+             </div>
+                       
            </div> 
          </div>
        </div>
@@ -258,17 +262,224 @@
         </div>
       </div> <!--end of modal-->
 
-      <div id="orderTemplate">
-        <tr >
-          <td id="orderId">1</td>
-          <td id="productId">1</td>
-          <td id="productName">abc</td>
-          <td id="productNumber">999</td>
-          <td id="deliverCompany">Company</td>
-          <td id="seller">0x</td>
-          <td id="totalFee">999</td>
-          <td id="state"></td>
-        </tr>
+      <div class="modal fade" id="orderOptions" style="display:none;"> 
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title">Order Options</h4>
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            
+          <div class="modal-body">  
+            <div class="container text-center">   
+              <div class="row">
+                <h5 > As Buyer</h5>
+              </div>       
+              <div class="btn-deck">
+                <button class="btn btn-primary " type="button" data-toggle="modal"  data-target="#payOrderModal" onclick="App.loadInfoForPay();">Pay Order</button>
+                <br><br>                      
+                <button class="btn btn-primary" href="#">Confirm Order</button>
+                <br><br>  
+                <button class="btn btn-primary" href="#">Will Return Order</button>
+                <br><br>
+                <button class="btn btn-primary" href="#">Returned Order</button>
+                <br><br>                     
+                <button class="btn btn-primary" href="#">Cancle</button>
+                <br><br>  
+              </div>                    
+              <hr> 
+              <div class="row">
+                <h5 > As Seller</h5>
+              </div>       
+              <div class="btn-deck">
+                <button class="btn btn-primary" type="button" data-toggle="modal"  data-target="#confirmRequest" onclick="App.loadInfoForConfirmRequest();">Confirm Request</button>
+                <br><br>      
+                <button class="btn btn-primary" type="button" data-toggle="modal"  data-target="#sellerSent" >Sent Order</button>
+                <br><br> 
+                <button class="btn btn-primary" href="#">Get Money From Order</button>
+                <br><br>            
+                <button class="btn btn-primary" href="#">Cancle</button>
+                <br><br> 
+              </div>                    
+              <hr>
+              <div class="row">
+                <h5> As courier</h5>
+              </div>       
+              <div class="btn-deck">
+                <button class="btn btn-primary" type="button" href="#">Delivered To Buyer</button>
+                <br><br>                      
+                <button class="btn btn-primary" href="#">Delivered To Seller</button>
+                <br><br>                   
+                <button class="btn btn-primary" href="#">Cancle</button>
+                <br><br>  
+              </div>                    
+              <hr>
+            </div>
+          </div>
+      </div> <!--end of modal-->
+
+      <div class="modal fade" id="payOrderModal" style="display:none;" > <!--start of modal-->
+        <div class="modal-dialog">
+          <div class="modal-content">
+
+            <!-- modal header -->
+            <div class="modal-header">
+              <h4 class="modal-title">Pay Order</h4>
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              
+            </div>
+            <!-- modal body -->
+            <div class="modal-body">
+              <form onSubmit="App.buyerPay(); return false;" class="from-group" id="payOrderForm" role="form">
+                <div>
+                  <label for="orderId">Order id</label>  
+                  <input id="orderId" class="form-control" value="0" required="required" readonly>
+                </div>
+                <br>
+                <div>
+                  <label for="totalFee">Total Fee</label>  
+                  <input id="totalFee" class="form-control" value="0" required="required" readonly>
+                </div>
+                <br>
+                <div>
+                  <label for="realName">Real Name</label> 
+                  <input id="realName" class="form-control" type="text" required="required" />
+                  <small class="form-text text-muted">Please input the real name of the addressee.</small>
+                </div>
+                <br>
+                <div>
+                  <label for="phoneNumber">phoneNumber</label> 
+                  <input id="phoneNumber" class="form-control" type="text" required="required"></inout>
+                  <small class="form-text text-muted">Please input the phone number of the addressee.</small>
+                </div>
+                <br>
+                <div>
+                  <label for="addressInfo">Address Info</label> 
+                  <input id="addressInfo" class="form-control" type="text" required="required" ></inout>
+                  <small class="form-text text-muted">Please input the address information of the addressee.</small>
+                </div>
+                <br>
+                <div>
+                  <label for="zipCode">ZIP Code</label> 
+                  <input id="zipCode" class="form-control" type="number" required="required" ></inout>
+                  <small class="form-text text-muted">Please input the zipcode of the addressee.</small>
+                </div>
+                <br>
+              </form>
+            </div>
+       
+            <!-- modal footer-->
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancle</button>
+              <button type="submit" class="btn btn-primary form-group-btn" data-dismiss="modal" onclick="App.buyerPay();" >Confirm</button>
+            </div>
+          </div>
+        </div>
+      </div> <!--end of modal-->
+
+      <div class="modal fade" id="confirmRequest" style="display:none;" > <!--start of modal-->
+        <div class="modal-dialog">
+          <div class="modal-content">
+
+            <!-- modal header -->
+            <div class="modal-header">
+              <h4 class="modal-title">Confirm Request</h4>
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              
+            </div>
+            <!-- modal body -->
+            <div class="modal-body">
+              <form onSubmit="App.sellerConfirm(); return false;" class="from-group" id="confirmRequestForm" role="form">
+                <div>
+                  <label for="orderId">Order id</label>  
+                  <input id="orderId" class="form-control" value="0" required="required" readonly>
+                </div>
+                <br>
+                <div>
+                  <label for="productId">Product id</label>  
+                  <input id="productId" class="form-control" value="0" required="required" readonly>
+                </div>
+                <br>
+                <div>
+                  <label for="requestNumber">Request Number</label>  
+                  <input id="requestNumber" class="form-control" value="0" required="required" readonly>
+                </div>
+                <br>
+                <div>
+                  <label for="realName">Real Name</label> 
+                  <input id="realName" class="form-control" type="text" required="required" />
+                  <small class="form-text text-muted">Please input your real name.</small>
+                </div>
+                <br>
+                <div>
+                  <label for="phoneNumber">phoneNumber</label> 
+                  <input id="phoneNumber" class="form-control" type="text" required="required"></inout>
+                  <small class="form-text text-muted">Please input your phone number.</small>
+                </div>
+                <br>
+                <div>
+                  <label for="addressInfo">Address Info</label> 
+                  <input id="addressInfo" class="form-control" type="text" required="required" ></inout>
+                  <small class="form-text text-muted">Please input your address information.</small>
+                </div>
+                <br>
+                <div>
+                  <label for="zipCode">ZIP Code</label> 
+                  <input id="zipCode" class="form-control" type="number" required="required" ></inout>
+                  <small class="form-text text-muted">Please input your zipcode.</small>
+                </div>
+                <br>
+              </form>
+            </div>
+       
+            <!-- modal footer-->
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancle</button>
+              <button type="submit" class="btn btn-primary form-group-btn" data-dismiss="modal" onclick="App.sellerConfirm();" >Confirm</button>
+            </div>
+          </div>
+        </div>
+      </div> <!--end of modal-->
+
+      <div class="modal fade" id="sellerSent" style="display:none;" > <!--start of modal-->
+        <div class="modal-dialog">
+          <div class="modal-content">
+
+            <!-- modal header -->
+            <div class="modal-header">
+              <h4 class="modal-title">Seller Sent Order</h4>
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              
+            </div>
+            <!-- modal body -->
+            <div class="modal-body">
+              <form onSubmit="App.sellerSent(); return false;" class="from-group" id="confirmRequestForm" role="form">
+                <div>
+                  <label for="hashedMessage">Hashed Message</label>  
+                  <input id="hashedMessage" class="form-control"  type="text" required="required">
+                  <small class="form-text text-muted">Please input the hashed message offerd by courier.</small>
+                </div>
+                <br>
+                <div>
+                  <label for="signature">Signature</label>  
+                  <input id="signature" class="form-control"  type="text" required="required">
+                  <small class="form-text text-muted">Please input the signature offerd by courier.</small>
+                </div>
+                <br>
+              </form>
+            </div>
+       
+            <!-- modal footer-->
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancle</button>
+              <button type="submit" class="btn btn-primary form-group-btn" data-dismiss="modal" onclick="App.sellerSent();">Confirm</button>
+            </div>
+          </div>
+        </div>
+      </div> <!--end of modal-->
+
+      <div id="optionButton" style="display: none">
+        <button class="btn btn-primary" onclick="$('#orderOptions').attr('data-id',$(this).attr('data-id'));" data-toggle="modal" data-target="#orderOptions">Options</button>
       </div>
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>

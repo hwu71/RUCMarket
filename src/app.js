@@ -479,35 +479,211 @@ App = {
     })
   },
   viewOrdersAsBuyer: function(){
+    $('#user-orders-content').find('#buyerOrSeller').text("Seller");
+    var userOrderTbody=$('#userOrderTbody');
+    userOrderTbody.empty();
+    var orderTemplate=$('#orderTemplate');
+    for(i=0;i<App.orders.length;i++){
+
+      var order = App.orders[i];
+      //console.log(order);
+      if(App.account === order.buyer){
+        var productName = App.products[order.productId-1].productName;
+        //console.log("productName",productName);
+        var deliverCompany = App.couriers[order.courierId-1].companyName;
+        //console.log("deliverCompany:",deliverCompany);
+        var totalFee = order.productValue + order.deliverFee;
+        //console.log("totalfee:", totalFee);
+        var state = App.State[order.state];
+        //console.log("state:",state);
+        var mtr =$("<tr></tr>");
+        var orderIdTd = $("<td></td>").text(order.orderId);
+        var productIdTd = $("<td></td>").text(order.productId);
+        var productNameTd = $("<td></td>").text(productName);
+        var productNumberTd = $("<td></td>").text(order.productNumber);
+        var deliverCompanyTd = $("<td></td>").text(deliverCompany);
+        var sellerTd = $("<td></td>").text(order.seller);
+        var totalFeeTd = $("<td></td>").text(totalFee);
+        var stateTd = $("<td></td>").text(state);
+        var optionTd = $("<td></td>");
+        /*var buttonTd = $("<button></button>").text("Options");
+        buttonTd.attr("type","button").attr("class","btn-primary").attr('data-id',order.orderId);
+        buttonTd.attr("data-toggle","modal").attr("data-target","#orderOptions");*/
+        var button = $('#optionButton');
+        button.find('button').attr("data-id",order.orderId);
+        optionTd.append(button.html());
+        //console.log(button.html());
+        //console.log(button)
+        mtr.append(orderIdTd);
+        mtr.append(productIdTd);
+        mtr.append(productNameTd);
+        mtr.append(productNumberTd);
+        mtr.append(deliverCompanyTd);
+        mtr.append(sellerTd);
+        mtr.append(totalFeeTd);
+        mtr.append(stateTd);
+        mtr.append(optionTd);
+        userOrderTbody.append(mtr);
+        //console.log(userOrderTbody.html())
+      }
+      
+    }
+  },
+  viewOrdersAsSeller: function(){
+    $('#user-orders-content').find('#buyerOrSeller').text("Buyer");
     var userOrderTbody=$('#userOrderTbody');
     userOrderTbody.empty();
     var orderTemplate=$('#orderTemplate');
     for(i=0;i<App.orders.length;i++){
       var order = App.orders[i];
-      console.log(order);
-      var productName = App.products[order.productId-1].productName;
-      //console.log("productName",productName);
-      var deliverCompany = App.couriers[order.courierId-1].companyName;
-      console.log("deliverCompany:",deliverCompany);
-      var totalFee = order.productValue + order.deliverFee;
-      console.log("totalfee:", totalFee);
-      var state = App.State[order.state];
-      console.log("state:",state);
-      orderTemplate.find('#orderId').text(order.orderId);
-      //orderTemplate.find('#orderId').innertext=order.orderId;
-      orderTemplate.find('#productId').text(order.productId);
-      orderTemplate.find('#productName').text(productName);
-      orderTemplate.find('#productNumber').text(order.productNumber);
-      orderTemplate.find('#deliverCompany').text(deliverCompany);
-      orderTemplate.find('#seller').text(order.seller);
-      orderTemplate.find('#totalFee').text(totalFee);
-      orderTemplate.find('#state').innertext=state;
-      //var test = $("<td></td>").innertext=state;
-      //console.log(test.;
-      console.log(orderTemplate.html());
-      userOrderTbody.append(orderTemplate);
+      //console.log(order);
+      if(App.account === order.seller){
+        var productName = App.products[order.productId-1].productName;
+        //console.log("productName",productName);
+        var deliverCompany = App.couriers[order.courierId-1].companyName;
+        //console.log("deliverCompany:",deliverCompany);
+        var totalFee = order.productValue + order.deliverFee;
+        //console.log("totalfee:", totalFee);
+        var state = App.State[order.state];
+        //console.log("state:",state);
+        var mtr =$("<tr></tr>");
+        var orderIdTd = $("<td></td>").text(order.orderId);
+        var productIdTd = $("<td></td>").text(order.productId);
+        var productNameTd = $("<td></td>").text(productName);
+        var productNumberTd = $("<td></td>").text(order.productNumber);
+        var deliverCompanyTd = $("<td></td>").text(deliverCompany);
+        var buyerTd = $("<td></td>").text(order.buyer);
+        var totalFeeTd = $("<td></td>").text(totalFee);
+        var stateTd = $("<td></td>").text(state);
+        var optionTd = $("<td></td>");
+        var button = $('#optionButton');
+        button.find('button').attr("data-id",order.orderId);
+        optionTd.append(button.html());
+        mtr.append(orderIdTd);
+        mtr.append(productIdTd);
+        mtr.append(productNameTd);
+        mtr.append(productNumberTd);
+        mtr.append(deliverCompanyTd);
+        mtr.append(buyerTd);
+        mtr.append(totalFeeTd);
+        mtr.append(stateTd);
+        mtr.append(optionTd);
+        userOrderTbody.append(mtr);
+        //console.log(userOrderTbody.html())
+      }
     }
   },
+  loadInfoForPay: function(){
+    var orderId = $('#orderOptions').attr('data-id');
+    //console.log("orderId:",orderId);
+    var payOrderModal = $('#payOrderModal');
+    var totalFee = App.orders[orderId-1].productValue + App.orders[orderId-1].deliverFee; 
+    payOrderModal.find('#orderId').val(orderId);
+    payOrderModal.find('#totalFee').val(totalFee);
+  },
+
+  buyerPay: function(){
+    var orderId = $('#orderOptions').attr('data-id');
+    var payOrderModal = $('#payOrderModal');
+    var name = payOrderModal.find('#realName').val();
+    var phoneNumber = payOrderModal.find('#phoneNumber').val();
+    var addressInfo = payOrderModal.find('#addressInfo').val();
+    var zipCode = payOrderModal.find('#zipCode').val();
+    var string = name + "|" + phoneNumber + "|" + addressInfo + "|" + zipCode;
+    //console.log(string);
+
+    var publicKey = App.couriers[App.orders[orderId].courierId - 1].publicKey;
+    //console.log(publicKey);
+    var encryptObject = new JSEncrypt();
+    encryptObject.setPublicKey(publicKey);
+    var encryptedString = encryptObject.encrypt(string);
+    //console.log(encryptedString);
+    App.contracts.RUCMarket.deployed().then(function(instance){
+      return instance.buyerPayOrder(orderId, encryptedString,{
+        from: App.account,
+        gas: 500000
+      })
+    }).then(function(result){
+      console.log("Buyer payed...",result);
+
+    })
+  },
+  loadInfoForConfirmRequest: function(){
+    var orderId = $('#orderOptions').attr('data-id');
+    //console.log("orderId:",orderId);
+    var confirmRequestModal = $('#confirmRequest');
+    //var totalFee = App.orders[orderId-1].productValue + App.orders[orderId-1].deliverFee; 
+    var productId = App.orders[orderId-1].productId;
+    var requestNumber = App.orders[orderId-1].productNumber;
+    confirmRequestModal.find('#orderId').val(orderId);
+    confirmRequestModal.find('#productId').val(productId);
+    confirmRequestModal.find('#requestNumber').val(requestNumber);
+  },
+
+  sellerConfirm: function(){
+    var orderId = $('#orderOptions').attr('data-id');
+    var confirmRequestModal = $('#confirmRequest');
+    var name = confirmRequestModal.find('#realName').val();
+    var phoneNumber = confirmRequestModal.find('#phoneNumber').val();
+    var addressInfo = confirmRequestModal.find('#addressInfo').val();
+    var zipCode = confirmRequestModal.find('#zipCode').val();
+    var string = name + "|" + phoneNumber + "|" + addressInfo + "|" + zipCode;
+    //console.log(string);
+
+    var publicKey = App.couriers[App.orders[orderId].courierId - 1].publicKey;
+    //console.log(publicKey);
+    var encryptObject = new JSEncrypt();
+    encryptObject.setPublicKey(publicKey);
+    var encryptedString = encryptObject.encrypt(string);
+    //console.log(encryptedString);
+    App.contracts.RUCMarket.deployed().then(function(instance){
+      return instance.sellerConfirmOrder(orderId, encryptedString,{
+        from: App.account,
+        gas: 500000
+      })
+    }).then(function(result){
+      console.log("Seller confirmed...",result);
+
+    })
+  },
+
+  sellerSent: function(){
+    var orderId = $('#orderOptions').attr('data-id');
+    var sellerSent = $('#sellerSent');
+    var hash = sellerSent.find('#hashedMessage').val();
+    var sig = sellerSent.find('#signature').val();
+    hash = 0xf43e5b8e9fbda3e9c08f71edc309a51e78055e79ffdfe551dfaf4d6deea2e39a;
+    sig = 0x29fae03093833b2371ed268a6a7b3738be42a9078addaeffe894e58f8d3f4a9a33dea4d91efe8718337ee4305c18ace94d7b6ea91df92fbfc479b9310416f8801c;
+    console.log(hash,sig);
+    //console.log(web3.utils.fromAscii(hash));
+    App.contracts.RUCMarket.deployed().then(function(instance){
+      return instance.sellerSendProduct(orderId,hash,sig,{
+        from: App.account,
+        gas: 500000
+      })
+    }).then(function(result){
+      console.log("Seller sent order...",result);
+    })
+  },
+  signMessage: function(){
+    $("#content").hide();
+    $("#loader").show();
+
+    const message = web3.sha3( $('#message').val() )
+    console.log('message', message)
+
+    web3.eth.sign(App.account, message, function (err, result) {
+      console.log(err, result)
+      $('form').trigger('reset')
+      App.msg = message
+      $('#msg').html('message:' + ' ' + message)
+      App.signature = result
+      $('#signature').html('signature:' + ' ' + result)
+      $("#content").show();
+      $("#loader").hide();
+      window.alert('Message signed!')
+    })
+  }
   
 
 }
