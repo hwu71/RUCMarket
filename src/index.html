@@ -27,7 +27,8 @@
              <a data-toggle="list" href="#view-product-content" class="list-group-item list-group-item-action active">View Products</a>
              <!--a data-toggle="list" href="#buy-product-content" class="list-group-item list-group-item-action">buy Products</a-->
              <a data-toggle="list" href="#add-product-content" class="list-group-item list-group-item-action">Add Products</a>
-             <a data-toggle="list" href="#view-order-content" class="list-group-item list-group-item-action">View Orders</a>
+             <a data-toggle="list" href="#view-order-user-content" class="list-group-item list-group-item-action">View Orders as user</a>
+             <a data-toggle="list" href="#view-order-courier-content" class="list-group-item list-group-item-action">View Orders as courier</a>
              <a data-toggle="list" href="#buy-token-content" class="list-group-item list-group-item-action" onclick="App.renderToken();">Buy token</a>
              <a data-toggle="list" href="#add-courier-content" class="list-group-item list-group-item-action">Add Courier</a>
              <a data-toggle="list" href="#courier-register-content" class="list-group-item list-group-item-action">Courier Register</a>
@@ -72,8 +73,47 @@
                   <button type="submit" class="btn btn-primary btn-lg form-group-btn" >Add Product</button>
                 </form>
              </div>
-             <div class="tab-pane fade" id="view-order-content"> 
-                View orders!
+             <div class="tab-pane fade" id="view-order-user-content"> 
+                <ul class="nav nav-tabs nav-fill justify-content-center">
+                  <li class="nav-item">
+                    <a href="#user-orders-content" class="nav-link active" onclick="App.viewOrdersAsBuyer()"> As buyer </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="#user-orders-content" class="nav-link" onclick="App.viewOrdersAsSeller()"> As seller </a>
+                  </li>
+                </ul>
+                <div id="user-orders-content"  >
+                  <table class="table talbe-bordered">
+                    <thead>
+                      <tr>
+                        <th>Order Id</th>
+                        <th>Product Id</th>
+                        <th>Product Name</th>
+                        <th>Product Number</th>
+                        <th>Deliver Company</th>
+                        <th id="buyerOrSeller">Seller</th>
+                        <th>Total Fee</th>
+                        <th>State</th>
+                      </tr>
+                    </thead>
+                    <tbody id="userOrderTbody">
+                      <tr>
+                        <td id="orderId">1</td>
+                        <td id="productId">1</td>
+                        <td id="productName">abc</td>
+                        <td id="productNumber">999</td>
+                        <td id="deliverCompany">Company</td>
+                        <td id="seller">0x</td>
+                        <td id="totalFee">999</td>
+                        <td id="state"></td>
+
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+             </div>
+             <div class="tab-pane fade" id="view-order-courier-content"> 
+                view orders as courier
              </div>
              <div class="tab-pane fade" id="buy-token-content">
                <div id="content" class="text-center" ></!--style="display: none;"-->
@@ -218,8 +258,17 @@
         </div>
       </div> <!--end of modal-->
 
-      <div id="orderTemplate" style="display: none;" class="">
-        
+      <div id="orderTemplate">
+        <tr >
+          <td id="orderId">1</td>
+          <td id="productId">1</td>
+          <td id="productName">abc</td>
+          <td id="productNumber">999</td>
+          <td id="deliverCompany">Company</td>
+          <td id="seller">0x</td>
+          <td id="totalFee">999</td>
+          <td id="state"></td>
+        </tr>
       </div>
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
@@ -227,7 +276,8 @@
     <script src="js/web3.min.js"></script>
     <script src="js/truffle-contract.min.js"></script>
     <script src="js/jsencrypt.min.js"></script>
-    <script src="js/vue.min.js"></script>
+    <script src="js/popper.min.js"></script>
+    <!--script src="js/vue.min.js"></script-->
     <!--script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script-->
     <script src="app.js"></script>
   </body>

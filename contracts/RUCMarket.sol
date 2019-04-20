@@ -63,7 +63,7 @@ contract RUCMarket {
   mapping (address => bool) isCourier;  // for check if a courier double registers
 
   Product[] public products;
-  Order[] orders;
+  Order[] public orders;
   Courier[] public couriers;
   
  
@@ -363,7 +363,9 @@ contract RUCMarket {
   function couriersNumber() external view returns(uint){
     return couriers.length;
   }
-
+  function ordresNumber() external view returns(uint){
+    return orders.length;
+  }
   function findOrderAndIndexById(uint _orderId) internal view returns(Order memory, uint) {
     for(uint i = 0; i < orders.length; i++) {
        if(orders[i].id == _orderId){

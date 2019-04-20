@@ -46,6 +46,7 @@
     
   }
 })*/
+//var orders = new Array();
 App = {
   web3Provider: null,
   contracts: {},
@@ -57,6 +58,11 @@ App = {
   tokenPrice: 1000000000000000,
   tokensSold: 0,
   tokensAvailable: 750000,
+  couriers: new Array(),
+  products: new Array(),
+  orders: new Array(),
+  State: ["REQUESTED", "PAYED", "SELLER_COMFIRMED", "SELLER_SENT", 
+  "BUYER_GOT", "COMPLETED", "WILL_RETURN", "BUYER_SENT", "SELLER_GOT", "CANCLED"],
 
   init: function() {
     console.log("App initialized...")
@@ -126,7 +132,9 @@ App = {
     // Load token sale contract
     App.renderProduct();
     App.renderAccount();
-    
+    App.loadCouriers();
+    App.loadProducts();
+    App.loadOrders();
     App.loading = false;
     loader.hide();
     content.show();
@@ -357,7 +365,151 @@ App = {
       console.log("Product requested...")
 
     })
-  }
+  },
+  Courier: function(_courierId,_accountAddress,_companyName,_publicKey,_deliverFee){
+    this.courierId = _courierId;
+    this.accountAddress = _accountAddress;
+    this.companyName = _companyName;
+    this.publicKey = _publicKey;
+    this.deliverFee = _deliverFee;
+  },
+  loadCouriers: function(){
+    App,couriers = [];
+    App.contracts.RUCMarket.deployed().then(function(instance){
+      //console.log(instance);
+      return instance.couriersNumber().then(function(result){
+        var couriersNumber = result.toNumber();
+        //console.log("productsNumber:",productsNumber);
+        for(i=0;i<couriersNumber;i++){
+          instance.couriers(i).then(function(instance){
+            var courierId = instance[0].toNumber();
+            var accountAddress = instance[1];
+            var companyName = instance[2];
+            var publicKey = instance[3];
+            var deliverFee = instance[4].toNumber();
+            var courier = new App.Courier(courierId,accountAddress,companyName,publicKey,deliverFee);
+            //App.products[i] = product;
+            //console.log(courier);
+            App.couriers.push(courier);
+          })
+
+        }
+      })
+    })
+  },
+
+  Product: function(_productId,_productName,_productPrice,_productNumber,_productSeller,_productUrl){
+    this.productId = _productId;
+    this.productName = _productName;
+    this.productPrice = _productPrice;
+    this.productNumber = _productNumber;
+    this.productSeller = _productSeller;
+    this.productUrl = _productUrl;
+  },
+
+  loadProducts: function(){
+    App.products = [];
+    App.contracts.RUCMarket.deployed().then(function(instance){
+      console.log(instance);
+      return instance.productsNumber().then(function(result){
+        var productsNumber = result.toNumber();
+        //console.log("productsNumber:",productsNumber);
+        for(i=0;i<productsNumber;i++){
+          instance.products(i).then(function(instance){
+            var productId = instance[0].toNumber();
+            var productName = instance[1];
+            var productPrice = instance[2].toNumber();
+            var productNumber = instance[3].toNumber();
+            var productSeller = instance[4];
+            var productUrl = instance[5];
+            var product = new App.Product(productId,productName,productPrice,productNumber,productSeller,productUrl);
+            //App.products[i] = product;
+            //console.log(product);
+            App.products.push(product);
+          })
+
+        }
+      })
+    })
+  },
+  Order: function(_orderId,_productId,_productValue,_deliverFee,_productNumber,_seller,_sellerAddress,_buyer,_buyerAddress,_courierId,_state,_deliverTime){
+    this.orderId=_orderId;
+    this.productId=_productId;
+    this.productValue = _productValue;
+    this.deliverFee = _deliverFee;
+    this.productNumber=_productNumber;
+    this.seller = _seller;
+    this.sellerAddress = _sellerAddress;
+    this.buyer = _buyer;
+    this.buyerAddress = _buyerAddress;
+    this.courierId=_courierId;
+    this.state = _state;
+    this.deliverTime = _deliverTime;
+  },
+  loadOrders: function(){
+    App.orders = [];
+    App.contracts.RUCMarket.deployed().then(function(instance){
+      console.log("instance address:",instance);
+      return instance.ordresNumber().then(function(result){
+        var ordersNumber = result;
+        //console.log(ordersNumber);
+        for(i=0;i<ordersNumber;i++){
+          instance.orders(i).then(function(instance){
+            var orderId = instance[0].toNumber();
+            var productId= instance[1].toNumber();
+            var productValue=instance[2].toNumber();
+            var deliverFee=instance[3].toNumber();
+            var productNumber=instance[4].toNumber();
+            var seller=instance[5];
+            var sellerAddress = instance[6];
+            var buyer = instance[7];
+            var buyerAddress = instance[8];
+            var courierId=instance[9].toNumber();
+            var state=instance[10].toNumber();
+            var deliverTime = instance[11].toNumber();
+            var order = new App.Order(orderId,productId,productValue,deliverFee,productNumber,seller,sellerAddress,buyer,buyerAddress,courierId,state,deliverTime);
+            //console.log("order:",order);
+            //App.orders[i] = order;
+            App.orders.push(order);
+            //console.log("orders:",App.orders);
+          })
+        }
+      })
+      
+    })
+  },
+  viewOrdersAsBuyer: function(){
+    var userOrderTbody=$('#userOrderTbody');
+    userOrderTbody.empty();
+    var orderTemplate=$('#orderTemplate');
+    for(i=0;i<App.orders.length;i++){
+      var order = App.orders[i];
+      console.log(order);
+      var productName = App.products[order.productId-1].productName;
+      //console.log("productName",productName);
+      var deliverCompany = App.couriers[order.courierId-1].companyName;
+      console.log("deliverCompany:",deliverCompany);
+      var totalFee = order.productValue + order.deliverFee;
+      console.log("totalfee:", totalFee);
+      var state = App.State[order.state];
+      console.log("state:",state);
+      orderTemplate.find('#orderId').text(order.orderId);
+      //orderTemplate.find('#orderId').innertext=order.orderId;
+      orderTemplate.find('#productId').text(order.productId);
+      orderTemplate.find('#productName').text(productName);
+      orderTemplate.find('#productNumber').text(order.productNumber);
+      orderTemplate.find('#deliverCompany').text(deliverCompany);
+      orderTemplate.find('#seller').text(order.seller);
+      orderTemplate.find('#totalFee').text(totalFee);
+      orderTemplate.find('#state').innertext=state;
+      //var test = $("<td></td>").innertext=state;
+      //console.log(test.;
+      console.log(orderTemplate.html());
+      userOrderTbody.append(orderTemplate);
+    }
+  },
+  
+
 }
 
 $(function() {
