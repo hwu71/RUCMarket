@@ -28,7 +28,7 @@
              <!--a data-toggle="list" href="#buy-product-content" class="list-group-item list-group-item-action">buy Products</a-->
              <a data-toggle="list" href="#add-product-content" class="list-group-item list-group-item-action">Add Products</a>
              <a data-toggle="list" href="#view-order-content" class="list-group-item list-group-item-action">View Orders</a>
-             <a data-toggle="list" href="#buy-token-content" class="list-group-item list-group-item-action">Buy token</a>
+             <a data-toggle="list" href="#buy-token-content" class="list-group-item list-group-item-action" onclick="App.renderToken();">Buy token</a>
              <a data-toggle="list" href="#add-courier-content" class="list-group-item list-group-item-action">Add Courier</a>
              <a data-toggle="list" href="#courier-register-content" class="list-group-item list-group-item-action">Courier Register</a>
             </div>
@@ -140,11 +140,19 @@
        </div>
 
       </div>
-      <hr>
-      <p class="text-center" id="accountAddress"></p>
-      <p class="text-center" id="ructoken-balance"></p>
-    </div>
+      <div id="loader" class="text-center">
+        <p >Loading...</p>
+      </div>
+      
+    </div> <!--end of container-->
 
+    <footer class="footer mt-auto py-3">
+      <div class = container id="accountInfo">
+        <hr>
+        <p class="text-center" id="accountAddress"></p>
+        <p class="text-center" id="ructoken-balance"></p>
+      </div>
+    </footer>
     
 
       <div id="productTemplate" style="display:none; width:400px; height:400px" class="card text-center">
@@ -190,7 +198,7 @@
                 </div>
                 <br>
                 <div>
-                  <label for="chooseCourier">Choose courier</label> 
+                  <label for="chooseCourier">Choose a delivery company</label> 
                   <select id="chooseCourier" class="form-control" required="required">
                     
                   </select>
@@ -204,11 +212,15 @@
             <!-- modal footer-->
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancle</button>
-              <button type="submit" class="btn btn-primary form-group-btn" data-dismiss="modal" >Confirm</button>
+              <button type="submit" class="btn btn-primary form-group-btn" data-dismiss="modal" onclick="App.requestProduct();" >Confirm</button>
             </div>
           </div>
         </div>
       </div> <!--end of modal-->
+
+      <div id="orderTemplate" style="display: none;" class="">
+        
+      </div>
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="./js/bootstrap.min.js"></script>

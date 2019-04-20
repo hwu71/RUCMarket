@@ -51,6 +51,9 @@ App = {
   contracts: {},
   account: '0x0',
   loading: false,
+  accountLoading: false,
+  productsLoading: false,
+  ordersLoading: false,
   tokenPrice: 1000000000000000,
   tokensSold: 0,
   tokensAvailable: 750000,
@@ -102,7 +105,7 @@ App = {
         toBlock: 'latest',
       }).watch(function(error, event) {
         console.log("event triggered", event);
-        App.render();
+        App.renderAccount();
       })
     })
   },
@@ -119,17 +122,39 @@ App = {
     content.hide();
 
     // Load account data
+    
+    // Load token sale contract
+    App.renderProduct();
+    App.renderAccount();
+    
+    App.loading = false;
+    loader.hide();
+    content.show();
+  },
+  renderAccount: function(){
+    App.accountLoading = true;
+    var loader = $('#loader');
+    var content = $('#accountInfo');
     web3.eth.getCoinbase(function(err, account) {
       if(err === null) {
         App.account = account;
         $('#accountAddress').html("Your Account: " + account);
       }
     })
-
-    // Load token sale contract
-    App.viewProduct();
-
-    App.contracts.RUCMarket.deployed().then(function(instance) {
+    App.contracts.RUCToken.deployed().then(function(instance) {
+        return instance.balanceOf(App.account);
+      }).then(function(balance) {
+        $('#ructoken-balance').html("Your RUC Token balance: " + balance.toNumber());
+      })
+      App.accountLoading = false;
+      loader.hide();
+      content.show();
+  },
+  renderToken: function(){
+    App.tokenLoading = true;
+    var loader  = $('#loader');
+    var content = $('#content');
+     App.contracts.RUCMarket.deployed().then(function(instance) {
       rucMarketInstance = instance;
       return rucMarketInstance.tokenPrice();
     }).then(function(tokenPrice) {
@@ -151,16 +176,16 @@ App = {
       }).then(function(balance) {
         $('.ructoken-balance').html(balance.toNumber());
         $('#ructoken-balance').html("Your RUC Token balance: " + balance.toNumber());
-        App.loading = false;
+        App.tokenLoading = false;
         loader.hide();
         content.show();
       })
     });
   },
-  viewProduct: function(){
+  renderProduct: function(){
     var productContent = $('#product-content');
     var productTemplate = $('#productTemplate');
-
+    $('#product-content').empty();
     App.contracts.RUCMarket.deployed().then(function(instance){
       //console.log("instance address: ",instance);
       //console.log("instance products:", instance.products);
@@ -307,7 +332,7 @@ App = {
                 //console.log("courierId:", courierId);
                 var companyName = courier[2];
                 var deliverFee = courier[4].toNumber();
-                var courierInfo = $("<option></option>").text(companyName+"("+deliverFee+")").attr('data-id',courierId);
+                var courierInfo = $("<option></option>").text(companyName+"("+deliverFee+")").attr('data-id',courierId).attr('data-fee',deliverFee);
                 chooseCourier.append(courierInfo);
               })
           }
@@ -316,8 +341,21 @@ App = {
     });
   },
   requestProduct: function(instance){
-    App.contracts.RUCMarket.deployed().than(function(instance){
+    var idOfProduct = $('#requestProduct').find('#idOfProduct').val();
+    //var priceOfProduct = $('#requestProduct').find('#priceOfProduct').val();
+    var requestNumber = $('#requestNumber').val();
+    var courierId = $('#chooseCourier').find("option:selected").attr("data-id");
+    //var deliverFee = $('#chooseCourier').find("option:selected").attr("data-fee");
+    console.log(idOfProduct,requestNumber,courierId);
+    App.contracts.RUCMarket.deployed().then(function(instance){
       console.log("instance address:",instance);
+      instance.purchaseRequest(idOfProduct, requestNumber,courierId,{
+        from: App.account,
+        gas: 500000
+      });
+    }).then(function(result){
+      console.log("Product requested...")
+
     })
   }
 }
