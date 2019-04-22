@@ -135,6 +135,8 @@ App = {
     App.loadCouriers();
     App.loadProducts();
     App.loadOrders();
+    //App.viewOrdersAsBuyer();
+    //App.viewOrdersAsCourier();
     App.loading = false;
     loader.hide();
     content.show();
@@ -450,7 +452,7 @@ App = {
     App.orders = [];
     App.contracts.RUCMarket.deployed().then(function(instance){
       console.log("instance address:",instance);
-      return instance.ordresNumber().then(function(result){
+      return instance.ordersNumber().then(function(result){
         var ordersNumber = result;
         //console.log(ordersNumber);
         for(i=0;i<ordersNumber;i++){
@@ -482,7 +484,7 @@ App = {
     $('#user-orders-content').find('#buyerOrSeller').text("Seller");
     var userOrderTbody=$('#userOrderTbody');
     userOrderTbody.empty();
-    var orderTemplate=$('#orderTemplate');
+    //var orderTemplate=$('#orderTemplate');
     for(i=0;i<App.orders.length;i++){
 
       var order = App.orders[i];
@@ -509,8 +511,9 @@ App = {
         /*var buttonTd = $("<button></button>").text("Options");
         buttonTd.attr("type","button").attr("class","btn-primary").attr('data-id',order.orderId);
         buttonTd.attr("data-toggle","modal").attr("data-target","#orderOptions");*/
-        var button = $('#optionButton');
+        var button = $('#buyerOptionButton');
         button.find('button').attr("data-id",order.orderId);
+        //button.find('button').attr("data-target","#buyerOrderOptions");
         optionTd.append(button.html());
         //console.log(button.html());
         //console.log(button)
@@ -533,7 +536,7 @@ App = {
     $('#user-orders-content').find('#buyerOrSeller').text("Buyer");
     var userOrderTbody=$('#userOrderTbody');
     userOrderTbody.empty();
-    var orderTemplate=$('#orderTemplate');
+    //var orderTemplate=$('#orderTemplate');
     for(i=0;i<App.orders.length;i++){
       var order = App.orders[i];
       //console.log(order);
@@ -556,8 +559,9 @@ App = {
         var totalFeeTd = $("<td></td>").text(totalFee);
         var stateTd = $("<td></td>").text(state);
         var optionTd = $("<td></td>");
-        var button = $('#optionButton');
+        var button = $('#sellerOptionButton');
         button.find('button').attr("data-id",order.orderId);
+        //button.find('button').attr("data-target","#sellerOrderOptions");
         optionTd.append(button.html());
         mtr.append(orderIdTd);
         mtr.append(productIdTd);
@@ -573,9 +577,49 @@ App = {
       }
     }
   },
+  viewOrdersAsCourier: function(){
+    //$('#courier-orders-content').
+    var courierOrderTbody=$('#courierOrderTbody');
+    courierOrderTbody.empty();
+   //var orderTemplate=$('#orderTemplate');
+    for(i=0;i<App.orders.length;i++){
+
+      var order = App.orders[i];
+      var courierAccount = App.couriers[order.courierId-1].accountAddress;
+      console.log(order);
+      if(App.account === courierAccount){
+        
+        var state = App.State[order.state];
+        console.log("state:",state);
+        var mtr =$("<tr></tr>");
+        var orderId = $("<td></td>").text(order.orderId); 
+        var seller = $("<td></td>").text(order.seller);
+        var sellerInfo = $("<td></td>").text(order.sellerAddress);
+        var buyer = $("<td></td>").text(order.buyer);
+        var buyerInfo = $("<td></td>").text(order.buyerAddress);
+        var state = $("<td></td>").text(state);
+        var optionTd = $("<td></td>");
+        var button = $('#courierOptionButton');
+        button.find('button').attr("data-id",order.orderId);
+        //button.find('button').attr("data-target","#courierOrderOptions");
+        optionTd.append(button.html());
+        //console.log(button.html());
+        //console.log(button)
+        mtr.append(orderId);
+        mtr.append(seller);
+        mtr.append(sellerInfo);
+        mtr.append(buyer);
+        mtr.append(buyerInfo);
+        mtr.append(state);
+        mtr.append(optionTd);
+        courierOrderTbody.append(mtr);
+        console.log(courierOrderTbody.html())
+      }   
+    }
+  },
   loadInfoForPay: function(){
-    var orderId = $('#orderOptions').attr('data-id');
-    //console.log("orderId:",orderId);
+    var orderId = $('#buyerOrderOptions').attr('data-id');
+    console.log("orderId:",orderId);
     var payOrderModal = $('#payOrderModal');
     var totalFee = App.orders[orderId-1].productValue + App.orders[orderId-1].deliverFee; 
     payOrderModal.find('#orderId').val(orderId);
@@ -583,7 +627,7 @@ App = {
   },
 
   buyerPay: function(){
-    var orderId = $('#orderOptions').attr('data-id');
+    var orderId = $('#buyerOrderOptions').attr('data-id');
     var payOrderModal = $('#payOrderModal');
     var name = payOrderModal.find('#realName').val();
     var phoneNumber = payOrderModal.find('#phoneNumber').val();
@@ -592,7 +636,7 @@ App = {
     var string = name + "|" + phoneNumber + "|" + addressInfo + "|" + zipCode;
     //console.log(string);
 
-    var publicKey = App.couriers[App.orders[orderId].courierId - 1].publicKey;
+    var publicKey = App.couriers[App.orders[orderId-1].courierId - 1].publicKey;
     //console.log(publicKey);
     var encryptObject = new JSEncrypt();
     encryptObject.setPublicKey(publicKey);
@@ -609,7 +653,7 @@ App = {
     })
   },
   loadInfoForConfirmRequest: function(){
-    var orderId = $('#orderOptions').attr('data-id');
+    var orderId = $('#sellerOrderOptions').attr('data-id');
     //console.log("orderId:",orderId);
     var confirmRequestModal = $('#confirmRequest');
     //var totalFee = App.orders[orderId-1].productValue + App.orders[orderId-1].deliverFee; 
@@ -621,7 +665,7 @@ App = {
   },
 
   sellerConfirm: function(){
-    var orderId = $('#orderOptions').attr('data-id');
+    var orderId = $('#sellerOrderOptions').attr('data-id');
     var confirmRequestModal = $('#confirmRequest');
     var name = confirmRequestModal.find('#realName').val();
     var phoneNumber = confirmRequestModal.find('#phoneNumber').val();
@@ -648,7 +692,7 @@ App = {
   },
 
   sellerSent: function(){
-    var orderId = $('#orderOptions').attr('data-id');
+    var orderId = $('#sellerOrderOptions').attr('data-id');
     var sellerSent = $('#sellerSent');
     var hash = sellerSent.find('#hashedMessage').val();
     var sig = sellerSent.find('#signature').val();

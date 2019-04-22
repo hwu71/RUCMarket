@@ -12,30 +12,30 @@
     
   </head>
   <body>
-    <div class="container" id="app" >
+    <div class="container-fluid" id="app" >
       
      <div class="row">
       <div class="col-lg-12">
-            <h1 class="text-center">RUC Marketplace</h1>
+            <h1 class="text-center display-3">RUC Marketplace</h1>
             <hr/>
             <br/>
       </div>
        
        <div id="content" class="row col-12" style="display: none;">
-         <div class="col-3">
+         <div class="col-sm-3 col-md-3 col-lg-2">
             <div class="list-group">
              <a data-toggle="list" href="#view-product-content" class="list-group-item list-group-item-action active">View Products</a>
              <!--a data-toggle="list" href="#buy-product-content" class="list-group-item list-group-item-action">buy Products</a-->
              <a data-toggle="list" href="#add-product-content" class="list-group-item list-group-item-action">Add Products</a>
-             <a data-toggle="list" href="#view-order-user-content" class="list-group-item list-group-item-action">View Orders as user</a>
-             <a data-toggle="list" href="#view-order-courier-content" class="list-group-item list-group-item-action">View Orders as courier</a>
+             <a data-toggle="list" href="#view-order-user-content" class="list-group-item list-group-item-action" >View Orders as user</a>
+             <a data-toggle="list" href="#view-order-courier-content" class="list-group-item list-group-item-action" onclick="App.viewOrdersAsCourier()">View Orders as courier</a>
              <a data-toggle="list" href="#buy-token-content" class="list-group-item list-group-item-action" onclick="App.renderToken();">Buy token</a>
              <a data-toggle="list" href="#add-courier-content" class="list-group-item list-group-item-action">Add Courier</a>
              <a data-toggle="list" href="#courier-register-content" class="list-group-item list-group-item-action">Courier Register</a>
              <a data-toggle="list" href="#sign-content" class="list-group-item list-group-item-action">Sign</a>
             </div>
          </div>
-         <div class="col-9">
+         <div class="col-sm-9 col-md-9 col-lg-10">
            <div class="tab-content">
              <div class="tab-pane fade show active" id="view-product-content">
               <div class="card-deck"  id="product-content">
@@ -84,7 +84,7 @@
                   </li>
                 </ul>
                 <div id="user-orders-content"  >
-                  <table class="table talbe-bordered">
+                  <table class="table talbe-bordered" style="table-layout: fixed;word-wrap:break-word;word-break:break-all;">
                     <thead>
                       <tr>
                         <th>Order Id</th>
@@ -104,7 +104,23 @@
                 </div>
              </div>
              <div class="tab-pane fade" id="view-order-courier-content"> 
-                view orders as courier
+                <div id="courier-orders-content"  >
+                  <table class="table talbe-bordered" style="table-layout: fixed;word-wrap:break-word;word-break:break-all;">
+                    <thead>
+                      <tr>
+                        <th>Order Id</th>
+                        <th>Seller Account</th>
+                        <th>Seller Info</th>
+                        <th>Buyer Account</th>
+                        <th>Buyer Info</th>
+                        <th>State</th>
+                        <th>Options</th>
+                      </tr>
+                    </thead>
+                    <tbody id="courierOrderTbody">
+                    </tbody>
+                  </table>
+                </div>
              </div>
              <div class="tab-pane fade" id="buy-token-content">
                <div id="content" class="text-center" ></!--style="display: none;"-->
@@ -262,7 +278,7 @@
         </div>
       </div> <!--end of modal-->
 
-      <div class="modal fade" id="orderOptions" style="display:none;"> 
+      <!--div class="modal fade" id="orderOptions" style="display:none;"> 
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
@@ -316,6 +332,81 @@
               <hr>
             </div>
           </div>
+      </div--> 
+      <div class="modal fade" id="buyerOrderOptions" style="display:none;"> 
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title">Order Options For Buyer</h4>
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            
+            <div class="modal-body">  
+              <div class="container text-center">         
+                <div class="btn-deck">
+                  <button class="btn btn-primary " type="button" data-toggle="modal"  data-target="#payOrderModal" onclick="App.loadInfoForPay();">Pay Order</button>
+                  <br><br>                      
+                  <button class="btn btn-primary" href="#">Confirm Order</button>
+                  <br><br>  
+                  <button class="btn btn-primary" href="#">Will Return Order</button>
+                  <br><br>
+                  <button class="btn btn-primary" href="#">Returned Order</button>
+                  <br><br>                     
+                  <button class="btn btn-primary" href="#">Cancle</button>
+                  <br><br>  
+                </div>                    
+              </div>
+            </div>
+          </div>
+        </div>
+      </div> <!--end of modal-->
+      <div class="modal fade" id="sellerOrderOptions" style="display:none;"> 
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title">Order Options For seller</h4>
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            
+            <div class="modal-body">  
+              <div class="container text-center">         
+                <div class="btn-deck">
+                  <button class="btn btn-primary" type="button" data-toggle="modal"  data-target="#confirmRequest" onclick="App.loadInfoForConfirmRequest();">Confirm Request</button>
+                  <br><br>      
+                  <button class="btn btn-primary" type="button" data-toggle="modal"  data-target="#sellerSent" >Sent Order</button>
+                  <br><br> 
+                  <button class="btn btn-primary" href="#">Get Money From Order</button>
+                  <br><br>            
+                  <button class="btn btn-primary" href="#">Cancle</button>
+                  <br><br> 
+                </div>                    
+              </div>
+            </div>
+          </div>
+        </div>
+      </div> <!--end of modal-->
+      <div class="modal fade" id="courierOrderOptions" style="display:none;"> 
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title">Order Options For courier</h4>
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            
+            <div class="modal-body">  
+              <div class="container text-center">         
+                <div class="btn-deck">
+                  <button class="btn btn-primary" type="button" href="#">Delivered To Buyer</button>
+                  <br><br>                      
+                  <button class="btn btn-primary" href="#">Delivered To Seller</button>
+                  <br><br>                   
+                  <button class="btn btn-primary" href="#">Cancle</button>
+                  <br><br> 
+                </div>                    
+              </div>
+            </div>
+          </div>
+        </div>
       </div> <!--end of modal-->
 
       <div class="modal fade" id="payOrderModal" style="display:none;" > <!--start of modal-->
@@ -478,8 +569,14 @@
         </div>
       </div> <!--end of modal-->
 
-      <div id="optionButton" style="display: none">
-        <button class="btn btn-primary" onclick="$('#orderOptions').attr('data-id',$(this).attr('data-id'));" data-toggle="modal" data-target="#orderOptions">Options</button>
+      <div id="buyerOptionButton" style="display: none">
+        <button class="btn btn-primary" onclick="$('#buyerOrderOptions').attr('data-id',$(this).attr('data-id'));" data-toggle="modal" data-target="#buyerOrderOptions">Options</button>
+      </div>
+      <div id="sellerOptionButton" style="display: none">
+        <button class="btn btn-primary" onclick="$('#sellerOrderOptions').attr('data-id',$(this).attr('data-id'));" data-toggle="modal" data-target="#sellerOrderOptions">Options</button>
+      </div>
+      <div id="courierOptionButton" style="display: none">
+        <button class="btn btn-primary" onclick="$('#courierOrderOptions').attr('data-id',$(this).attr('data-id'));" data-toggle="modal" data-target="#courierOrderOptions">Options</button>
       </div>
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
