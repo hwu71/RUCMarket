@@ -63,6 +63,8 @@ App = {
   orders: new Array(),
   State: ["REQUESTED", "PAYED", "SELLER_COMFIRMED", "SELLER_SENT", 
   "BUYER_GOT", "COMPLETED", "WILL_RETURN", "BUYER_SENT", "SELLER_GOT", "CANCLED"],
+  msg: '0x0',
+  signature: '0x0',
 
   init: function() {
     console.log("App initialized...")
@@ -674,7 +676,7 @@ App = {
     var string = name + "|" + phoneNumber + "|" + addressInfo + "|" + zipCode;
     //console.log(string);
 
-    var publicKey = App.couriers[App.orders[orderId].courierId - 1].publicKey;
+    var publicKey = App.couriers[App.orders[orderId-1].courierId - 1].publicKey;
     //console.log(publicKey);
     var encryptObject = new JSEncrypt();
     encryptObject.setPublicKey(publicKey);
@@ -694,19 +696,63 @@ App = {
   sellerSent: function(){
     var orderId = $('#sellerOrderOptions').attr('data-id');
     var sellerSent = $('#sellerSent');
-    var hash = sellerSent.find('#hashedMessage').val();
-    var sig = sellerSent.find('#signature').val();
-    hash = 0xf43e5b8e9fbda3e9c08f71edc309a51e78055e79ffdfe551dfaf4d6deea2e39a;
-    sig = 0x29fae03093833b2371ed268a6a7b3738be42a9078addaeffe894e58f8d3f4a9a33dea4d91efe8718337ee4305c18ace94d7b6ea91df92fbfc479b9310416f8801c;
-    console.log(hash,sig);
+    //var hash = sellerSent.find('#hashedMessage').val();
+    //var sig = sellerSent.find('#signature').val();
+    //hash = 0xf43e5b8e9fbda3e9c08f71edc309a51e78055e79ffdfe551dfaf4d6deea2e39a;
+    //sig = 0x29fae03093833b2371ed268a6a7b3738be42a9078addaeffe894e58f8d3f4a9a33dea4d91efe8718337ee4305c18ace94d7b6ea91df92fbfc479b9310416f8801c;
+    //console.log(hash,sig);
     //console.log(web3.utils.fromAscii(hash));
     App.contracts.RUCMarket.deployed().then(function(instance){
-      return instance.sellerSendProduct(orderId,hash,sig,{
+      return instance.sellerSendProduct(orderId,App.msg,App.signature,{
         from: App.account,
         gas: 500000
       })
     }).then(function(result){
       console.log("Seller sent order...",result);
+    })
+  },
+  deliveredToBuyer: function(){
+    var orderId = $('#courierOrderOptions').attr('data-id');
+    App.contracts.RUCMarket.deployed().then(function(instance){
+      return instance.productDeliveredToBuyer(orderId,App.msg,App.signature,{
+        from:App.account,
+        gas:500000
+      })
+    }).then(function(result){
+      console.log("Order delivered to buyer...",result);
+    })
+  },
+  /*sellerSentOrder: function(){
+    var orderId = $('#sellerOrderOptions').attr('data-id');
+    var courierAccount = App.couriers[App.orders[orderId-1].courierId-1].accountAddress;
+    console.log('courierAccount',courierAccount);
+    const message = web3.sha3("Seller Sent");
+    console.log('message', message);
+
+    web3.eth.sign(courierAccount, message, function(err, result){
+      console.log(err,result);
+      App.msg = message;
+      App.signature = result;
+    })
+    App.contracts.RUCMarket.deployed().then(function(instance){
+      console.log(App.msg,App.signature);
+      return instance.sellerSendProduct(orderId,App.msg,App.signature, {
+        from: App.account,
+        gas: 500000
+      }).then(function(result){
+        console.log("Seller sent order...",result);
+      })
+    })
+  },*/
+  buyerConfirmOrder: function(){
+    var orderId = $('#buyerOrderOptions').attr('data-id');
+    App.contracts.RUCMarket.deployed().then(function(instance){
+      return instance.buyerConfirm(orderId,{
+        from:App.account,
+        gas: 500000
+      })
+    }).then(function(result){
+      console.log("Buyer confirmed order...",result);
     })
   },
   signMessage: function(){

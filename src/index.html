@@ -278,61 +278,6 @@
         </div>
       </div> <!--end of modal-->
 
-      <!--div class="modal fade" id="orderOptions" style="display:none;"> 
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h4 class="modal-title">Order Options</h4>
-              <button type="button" class="close" data-dismiss="modal">&times;</button>
-            </div>
-            
-          <div class="modal-body">  
-            <div class="container text-center">   
-              <div class="row">
-                <h5 > As Buyer</h5>
-              </div>       
-              <div class="btn-deck">
-                <button class="btn btn-primary " type="button" data-toggle="modal"  data-target="#payOrderModal" onclick="App.loadInfoForPay();">Pay Order</button>
-                <br><br>                      
-                <button class="btn btn-primary" href="#">Confirm Order</button>
-                <br><br>  
-                <button class="btn btn-primary" href="#">Will Return Order</button>
-                <br><br>
-                <button class="btn btn-primary" href="#">Returned Order</button>
-                <br><br>                     
-                <button class="btn btn-primary" href="#">Cancle</button>
-                <br><br>  
-              </div>                    
-              <hr> 
-              <div class="row">
-                <h5 > As Seller</h5>
-              </div>       
-              <div class="btn-deck">
-                <button class="btn btn-primary" type="button" data-toggle="modal"  data-target="#confirmRequest" onclick="App.loadInfoForConfirmRequest();">Confirm Request</button>
-                <br><br>      
-                <button class="btn btn-primary" type="button" data-toggle="modal"  data-target="#sellerSent" >Sent Order</button>
-                <br><br> 
-                <button class="btn btn-primary" href="#">Get Money From Order</button>
-                <br><br>            
-                <button class="btn btn-primary" href="#">Cancle</button>
-                <br><br> 
-              </div>                    
-              <hr>
-              <div class="row">
-                <h5> As courier</h5>
-              </div>       
-              <div class="btn-deck">
-                <button class="btn btn-primary" type="button" href="#">Delivered To Buyer</button>
-                <br><br>                      
-                <button class="btn btn-primary" href="#">Delivered To Seller</button>
-                <br><br>                   
-                <button class="btn btn-primary" href="#">Cancle</button>
-                <br><br>  
-              </div>                    
-              <hr>
-            </div>
-          </div>
-      </div--> 
       <div class="modal fade" id="buyerOrderOptions" style="display:none;"> 
         <div class="modal-dialog">
           <div class="modal-content">
@@ -346,7 +291,7 @@
                 <div class="btn-deck">
                   <button class="btn btn-primary " type="button" data-toggle="modal"  data-target="#payOrderModal" onclick="App.loadInfoForPay();">Pay Order</button>
                   <br><br>                      
-                  <button class="btn btn-primary" href="#">Confirm Order</button>
+                  <button class="btn btn-primary" onclick="App.buyerConfirmOrder();">Confirm Order</button>
                   <br><br>  
                   <button class="btn btn-primary" href="#">Will Return Order</button>
                   <br><br>
@@ -374,6 +319,7 @@
                   <button class="btn btn-primary" type="button" data-toggle="modal"  data-target="#confirmRequest" onclick="App.loadInfoForConfirmRequest();">Confirm Request</button>
                   <br><br>      
                   <button class="btn btn-primary" type="button" data-toggle="modal"  data-target="#sellerSent" >Sent Order</button>
+                  <!--button class="btn btn-primary" type="button" onclick="App.sellerSentOrder();" >Sent Order</button-->
                   <br><br> 
                   <button class="btn btn-primary" href="#">Get Money From Order</button>
                   <br><br>            
@@ -396,7 +342,7 @@
             <div class="modal-body">  
               <div class="container text-center">         
                 <div class="btn-deck">
-                  <button class="btn btn-primary" type="button" href="#">Delivered To Buyer</button>
+                  <button class="btn btn-primary" type="button" data-toggle="modal"  data-target="#deliveredToBuyer">Delivered To Buyer</button>
                   <br><br>                      
                   <button class="btn btn-primary" href="#">Delivered To Seller</button>
                   <br><br>                   
@@ -564,6 +510,40 @@
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancle</button>
               <button type="submit" class="btn btn-primary form-group-btn" data-dismiss="modal" onclick="App.sellerSent();">Confirm</button>
+            </div>
+          </div>
+        </div>
+      </div> <!--end of modal-->
+      <div class="modal fade" id="deliveredToBuyer" style="display:none;" > <!--start of modal-->
+        <div class="modal-dialog">
+          <div class="modal-content">
+
+            <div class="modal-header">
+              <h4 class="modal-title">Order deliverd to buyer</h4>
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              
+            </div>
+            <div class="modal-body">
+              <form onSubmit="App.deliveredToBuyer(); return false;" class="from-group"  role="form">
+                <div>
+                  <label for="hashedMessage">Hashed Message</label>  
+                  <input id="hashedMessage" class="form-control"  type="text" required="required">
+                  <small class="form-text text-muted">Please input the hashed message offerd by buyer.</small>
+                </div>
+                <br>
+                <div>
+                  <label for="signature">Signature</label>  
+                  <input id="signature" class="form-control"  type="text" required="required">
+                  <small class="form-text text-muted">Please input the signature offerd by buyer.</small>
+                </div>
+                <br>
+              </form>
+            </div>
+       
+            <!-- modal footer-->
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancle</button>
+              <button type="submit" class="btn btn-primary form-group-btn" data-dismiss="modal" onclick="App.deliveredToBuyer();">Confirm</button>
             </div>
           </div>
         </div>
